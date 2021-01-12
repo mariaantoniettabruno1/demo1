@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accesso a DB da app java web</title>
+</head>
+<body>
+<!--<div>Invoca la Servlet</div> -->
+<form method ="post">
+
+    <p style="text-align:center;">
+
+    <input type="text" name="account" id="account">
+    <input type="text" name="pwd" id="pwd">
+    <input type="submit" name="login" value="login"   formaction="/UtenteServlet" >
+    </p>
+
+
+    <!-- <p><input type="submit" name="Login" value="Login" formaction="/demo1/ModificaServlet"></p>-->
+
+ </form>
+<div id="loggato" name="loggato" value="2"></div>
+<script language="JavaScript">
+    $(document).ready(function () { // When the DOM of this page is constructed
+        $('#login').click(function () {// on click of
+            //getWeatherReport button do ...
+            var account = document.getElementById('account').value;
+            var pwd = document.getElementById('pwd').value;
+
+            var pwd = document.getElementById("pwd").value;
+            $.post('/UtenteServlet', {utente: account, password: pwd},
+                function (data) {
+
+                    $('#loggato').html(data);
+
+                });
+        });
+    });
+
+</script>
+ </body>
+ </html>
