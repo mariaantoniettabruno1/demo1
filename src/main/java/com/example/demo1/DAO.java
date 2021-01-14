@@ -261,14 +261,17 @@ public class DAO {
         Statement st = conn.createStatement();
         ResultSet rs;
         String out = "";
-        out = out + "Tabella Ripetizioni: " + "\n";
+        out = out + "Tabella ripetizioni: " + "\n";
         rs = st.executeQuery("SELECT * FROM ripetizioni");
         while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia" + ", Data = " + rs.getString("Data") +
-                    ", ora = " + rs.getString("Ora") + ", disponibilita = " + rs.getString("disponibilita")   );
+            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") +
+                    ", Data= "+rs.getDate("Data")+", Ora= "+rs.getTime("Ora")+", Disponibilita= "+rs.getString("disponibilita")+"\n";
         }
         out = out + "Fine";
-        rs.close(); st.close(); conn.close(); return out;
+        rs.close();
+        st.close();
+        conn.close();
+        return out;
     }
 
     public static String showPrenotazione(String account) throws SQLException {

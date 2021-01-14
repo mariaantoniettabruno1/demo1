@@ -51,12 +51,12 @@ public class ModificaServlet extends HttpServlet {
                 out.println("Corso "+nomeCorso+"Aggiunto");
             }
        else*/
-
+            /*
                 if(nomeDocente!=null && cognomeDocente!=null){
                 if(user!=null && password!=null) {
                     if (DAO.checkAcc(""+user,""+password).equals("amministratore")) {
-                        /*DAO.insertDocente("" + nomeDocente, "" + cognomeDocente);
-                        out.println("Docente " + nomeDocente + " " + cognomeDocente + " Aggiunto. <br>");*/
+                        DAO.insertDocente("" + nomeDocente, "" + cognomeDocente);
+                        out.println("Docente " + nomeDocente + " " + cognomeDocente + " Aggiunto. <br>");
                         out.println("Loggato come amministratore");
                     }
                     else {
@@ -68,9 +68,31 @@ public class ModificaServlet extends HttpServlet {
                     out.println("Le variabili dell'account sono nulle.");
                 }
             }
-            else {
-                out.println("Le variabili del docente sono nulle.");
+            else{
+                    out.println("Le variabili del docente sono nulle.");
+                    }*/
+            if(azione.equals("login")){
+                if(user!=null && password!=null) {
+                    if (DAO.checkAcc("" + user, "" + password).equals("amministratore")) {
+                        out.println("Loggato come amministratore");
+                    }
+                    else if(DAO.checkAcc("" + user, "" + password).equals("cliente")){
+                        out.println("<pclass='w-25 p-3 position-absolute top-0 start-50 translate-middle'>Sei loggato come Utente</p>");
+                        out.println("<button type='button' class='btn btn-primary' id='ripetizioni' >Ripetizioni Disponibili</button>");
+                        out.println("<button type='button' class='btn btn-primary' id='prenotazione'>Cronologia Prenotazioni</button>");
+
+                    }
+                }
             }
+            else if(azione.equals("showRipetizioni")){
+                out.println("test");
+                out.println(DAO.showRipetizioni());
+            }
+            else{
+                out.println(azione);
+            }
+
+
             s.setAttribute("user",user);
             String url = response.encodeURL("ModificaServlet");
             /*

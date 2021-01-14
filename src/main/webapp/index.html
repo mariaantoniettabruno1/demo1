@@ -45,6 +45,13 @@
 
         methods: {
 
+            showForm(){
+
+                this.isActive = !this.isActive;
+
+            }
+
+
         }
 
     });
@@ -65,26 +72,30 @@ $(document).on("click", "#logga", function() { // When HTML DOM "click" event is
 });
 
 
+$(document).on("click", "#ripetizioni", function() {
 
-    /*
-    $(document).ready(function () { // When the DOM of this page is constructed
-        $('#login').click(function () {// on click of
-            //getWeatherReport button do ...
-            var account = document.getElementById('account').value;
-            var pwd = document.getElementById('pwd').value;
+    clear();
 
-            var pwd = document.getElementById("pwd").value;
-            $.post('/UtenteServlet', {utente: account, password: pwd},
-                function (data) {
+    var azione = "showRipetizioni";
 
-                    $('#loggato').html(data);
+    $.post("ModificaServlet", {azione:azione},function (data) {
 
-                });
-        });
-    });
-*/
+        $("#loggato").html(data);
+
+        if (!isEmpty($('#loggato'))){
+            vm.formEmpty = false;
+        }
+        else{
+            vm.formEmpty = true;
+        }
 
 
+    },
+
+
+);
+
+});
 
 
 </script>
