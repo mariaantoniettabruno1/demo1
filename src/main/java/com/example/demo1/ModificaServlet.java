@@ -39,6 +39,7 @@ public class ModificaServlet extends HttpServlet {
             String cognomeDocente = request.getParameter("cognomeDocente");
             String user = request.getParameter("utente");
             String password = request.getParameter("password");
+            String azione = request.getParameter("azione");
 /*
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -74,28 +75,16 @@ public class ModificaServlet extends HttpServlet {
             if(azione.equals("checkACC")){
                 s.setAttribute("Utente", user);
                 s.setAttribute("Password", password);
-                String valido = (DAO.checkAcc("" + user, "" + password));
-                if(valido.equals("cliente")){
-                    out.println("<p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>");
-                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>");
-                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>");
-                    out.println("<div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>");
-                }
-                else if(valido.equals("amministratore")) {
-                    out.println("<p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Admin</p>");
-                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>");
-                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>");
-                    out.println("<div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>");
-                }
 
+                String valido = (DAO.checkAcc("" + user, "" + password));
+                out.println(valido);
 
             }
             else if(azione.equals("showRipetizioni")){
-                out.println("test");
                 out.println(DAO.showRipetizioni());
             }
-            else{
-                out.println(azione);
+            else if(azione.equals("showPrenotazione")){
+                out.println(DAO.showPrenotazione(s.getAttribute("Utente").toString()));
             }
 
 

@@ -3,42 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Unito</title>
-    <!-- import script di Vue.js e BootsTrap -->
+    <!-- import Vue, Ajax, BootsTrap, javascript e css -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> <!-- Vue -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- Ajax -->
+    <script src="jquery.session.js"></script> <!-- jquery session -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- BootsTrap -->
-    <link href="Style.css" rel="stylesheet" > <!-- Nostro css -->
+    <link href="Style.css" rel="stylesheet"> <!-- Nostro css -->
 </head>
 <body>
 <div id="app">
-<!--<button id="showLogin" @click="changeActive" v-show="!isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle" >Vai al login</button>-->
-<div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
-
-    <form>
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" aria-describedby="emailHelp" id="username">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-             <input type="password" class="form-control" id="password">
-        </div>
-        <button type="button" class="btn btn-primary" id="logga">Login</button>
-    </form>
-</div>
-
-<div id="loggato" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
-
-</div>
-
+    <loginform ref="templateApp"></loginform>
+    <bottoni ref="templateBottoni"></bottoni>
 </div>
 <script>
+
     // script Vue.js
 
-    Vue.component('App', App);
-    Vue.component('Bottoni',Bottoni);
+    //componente e template per l'html del form di login, compreso di logica dei bottoni e richiamo della servlet.
+    var loginFormJS = Vue.component('loginform',{
 
-    var App = Vue.extend({
         template: `
 <div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
 
@@ -77,16 +60,13 @@
 
                 var ruolo = "";
                 var self = this;
-                var a = vm.LoginForm;
-                var b = vm.Bottoni;
-
                 $.post("ModificaServlet", {utente: utente, password: password, azione: azione}, function (ServletOutput) {
 
                     self.ruolo = ServletOutput;
 
-                    if(self.ruolo.trim() === "amministratore" || self.ruolo.trim() === "cliente"){
+                    if( self.ruolo.trim() === "cliente" || self.ruolo.trim() === "amministratore"){
                         self.showForm();
-                        vm.$refs.templateBottoni.showForm();
+                        vm.$refs.templateBottoni.passaRuolo(self.ruolo.trim());
                     }
                     else{
                         alert("Utente non registrato");
@@ -98,85 +78,97 @@
         }
     });
 
-
-
-
-    var Bottoni = Vue.extend({
+    //componente e template per l'html dei bottoni che appaiono una volta loggato, compresi di logica e richiami della servlet.
+    var bottoniJS = Vue.component('bottoni',{
         template: `
-        <div v-show="isActive">
+        <div v-if="ruolo.trim() === 'cliente'">
         <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>
-        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>
-        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>
-        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>
+        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' v-on:click="showRipetizioni">Ripetizioni Disponibili</button>
+        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'   v-on:click="showPrenotazione">Cronologia Prenotazioni</button>
+        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'> {{ stampa }} </div>
+        </div>
+
+        <div v-else-if="ruolo.trim() === 'amministratore'">
+        <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Amministratore</p>
+        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' v-on:click="showRipetizioni">Ripetizioni Disponibili</button>
+        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'   v-on:click="showPrenotazione">Cronologia Prenotazioni</button>
+        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'> {{ stampa }}</div>
         </div>
         `,
         data(){
             return {
-                isActive:false
+                ruolo : "",
+                stampa : ""
             };
         }
     ,
         methods: {
             showForm() {
                 this.isActive = !this.isActive;
+            },
+
+            passaRuolo(s){
+                this.ruolo = s;
+            },
+
+            showRipetizioni(){
+                var azione = "showRipetizioni";
+
+                var self = this;
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (ServletOutput) {
+
+                        self.stampa = ServletOutput;
+
+                        $("#loggato").html(self.stampa);
+                        console.log(self.stampa)
+                    },
+                );
+            },
+
+            showPrenotazione(){
+                var azione = "showPrenotazione";
+
+                var self = this;
+                var stampa = "";
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (ServletOutput) {
+
+                        self.stampa = ServletOutput;
+
+                        $("#loggato").html(self.stampa);
+                        console.log(self.stampa)
+                    },
+                );
+
             }
         }
     });
 
-
-
+    // inizializzazione del vue model
     var vm = new Vue({
 
         el: '#app',
-        data:{
-
-        }
-        });
+        data: {}
+    });
 
 
-
-
-
-
-// script Ajax
-
-$(document).on("click", "#logga", function() { // When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
-
-        var utente = document.getElementById("username").value;
-        var password = document.getElementById("password").value;
-
-        $.post("ModificaServlet", {utente: utente, password: password},
-            function (data) {
-
-                $("#loggato").html(data);
-
-            });
-});
-
-
+    // script Ajax
+    function isEmpty(el) {
+        return !$.trim(el.html())
+    }
+/*
     $(document).on("click", "#ripetizioni", function () {
 
-    clear();
+        var azione = "showRipetizioni";
 
-    var azione = "showRipetizioni";
-
-    $.post("ModificaServlet", {azione:azione},function (data) {
-
-        $("#loggato").html(data);
-
-        if (!isEmpty($('#loggato'))){
-            vm.formEmpty = false;
-        }
-        else{
-            vm.formEmpty = true;
-        }
-
-
-    },
-
-
-);
-
+        $.post("ModificaServlet", {azione: azione},
+            function (data) {
+                $("#loggato").html(data);
+            },
+        );
     });
 
     $(document).on("click", "#prenotazione", function() {
@@ -186,16 +178,16 @@ $(document).on("click", "#logga", function() { // When HTML DOM "click" event is
         $.post("ModificaServlet", {azione: azione},
             function (data) {
                 $("#loggato").html(data);
-
-
             },
-
-
         );
-
     });
 
-
+    //script Javascript
+    function clear() {
+        document.getElementById("loggato").innerHTML = "";
+        document.getElementById("app").innerHTML = "";
+    }*/
 </script>
- </body>
+
+</body>
  </html>

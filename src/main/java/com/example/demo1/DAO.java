@@ -225,7 +225,10 @@ public class DAO {
             out = out + "idDocente= " + rs.getInt("idDocente") + ", Nome = " + rs.getString("NOME") + "\n";
         }
         out = out + "Fine";
-        rs.close(); st.close(); conn.close(); return out;
+        rs.close();
+        st.close();
+        conn.close();
+        return out;
     }
 
     public static String showCorso() throws SQLException {
@@ -239,7 +242,10 @@ public class DAO {
             out = out + "nomeCorso= " + rs.getString("Materia") + "\n";
         }
         out = out + "Fine";
-        rs.close(); st.close(); conn.close(); return out;
+        rs.close();
+        st.close();
+        conn.close();
+        return out;
     }
 
     public static String showInsegna() throws SQLException {
@@ -253,7 +259,10 @@ public class DAO {
             out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + "\n";
         }
         out = out + "Fine";
-        rs.close(); st.close(); conn.close(); return out;
+        rs.close();
+        st.close();
+        conn.close();
+        return out;
     }
 
     public static String showRipetizioni() throws SQLException {
@@ -279,14 +288,17 @@ public class DAO {
         Statement st = conn.createStatement();
         ResultSet rs;
         String out = "";
-        out = out + "Tabella Prenotazione: " + "\n";
-        rs = st.executeQuery("SELECT * FROM prenotazione WHERE Prenotazione.account =" + account +"");
+        out = out + "Tabella prenotazioni: " + "\n";
+        rs = st.executeQuery("SELECT * FROM prenotazione WHERE prenotazione.account ='"+account+"'");
         while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia" + ", Account = " + rs.getString("Account") +
-                    ", Data = " + rs.getString("Data") + ", Ora = " + rs.getString("Ora") + ", stato = " + rs.getString("Stato"));
+            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + ", account= "+rs.getString("account") +
+                    ", Data= "+rs.getDate("Data")+", Ora= "+rs.getTime("Ora")+", Stato= "+rs.getString("stato")+"\n";
         }
         out = out + "Fine";
-        rs.close(); st.close(); conn.close(); return out;
+        rs.close();
+        st.close();
+        conn.close();
+        return out;
     }
 
 }
