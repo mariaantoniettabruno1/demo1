@@ -33,28 +33,110 @@
 
 </div>
 <script>
-// script Vue
+    // script Vue
+
+    Vue.component('App', App);
+    Vue.component('Bottoni',Bottoni);
+
+    var App = Vue.extend({
+        template: `
+<div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
+
+    <form v-on:submit.prevent="login">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" aria-describedby="emailHelp" id="username" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+             <input type="password" class="form-control" id="password" required autocomplete="off">
+        </div>
+        <input type="submit" class="btn btn-primary" id="logga" value="login">
+    </form>
+
+    <div id="loggato"></div>
+</div>
+    `,
+        data() {
+            return {
+                isActive:true
+            };
+        }
+        ,
+        methods: {
+            showForm() {
+                this.isActive = !this.isActive;
+            },
+
+            login(){
+                var utente = document.getElementById("username").value;
+                var password = document.getElementById("password").value;
+
+                //se il form è compilato mandiamo una richiesta alla servlet che contatta il DAO per vedere se l'account ricevuto in input è valido
+                azione = "checkACC";
+
+                var ruolo = "";
+                var self = this;
+                var a = vm.LoginForm;
+                var b = vm.Bottoni;
+
+                $.post("ModificaServlet", {utente: utente, password: password, azione: azione}, function (ServletOutput) {
+
+                    self.ruolo = ServletOutput;
+
+                    if(self.ruolo.trim() === "amministratore" || self.ruolo.trim() === "cliente"){
+                        self.showForm();
+                        vm.$refs.templateBottoni.showForm();
+                    }
+                    else{
+                        alert("Utente non registrato");
+                    }
+
+                });
+            }
+
+        }
+    });
+
+
+
+
+    var Bottoni = Vue.extend({
+        template: `
+        <div v-show="isActive">
+        <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>
+        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>
+        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>
+        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>
+        </div>
+        `,
+        data(){
+            return {
+                isActive:false
+            };
+        }
+    ,
+        methods: {
+            showForm() {
+                this.isActive = !this.isActive;
+            }
+        }
+    });
+
+
+
     var vm = new Vue({
 
         el: '#app',
         data:{
 
-            isActive:true
-
-        },
-
-        methods: {
-
-            showForm(){
-
-                this.isActive = !this.isActive;
-
-            }
-
-
         }
+        });
 
-    });
+
+
+
+
 
 // script Ajax
 
