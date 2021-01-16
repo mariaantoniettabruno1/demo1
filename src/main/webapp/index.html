@@ -72,7 +72,7 @@ $(document).on("click", "#logga", function() { // When HTML DOM "click" event is
 });
 
 
-$(document).on("click", "#ripetizioni", function() {
+    $(document).on("click", "#ripetizioni", function() {
 
     clear();
 
@@ -95,7 +95,23 @@ $(document).on("click", "#ripetizioni", function() {
 
 );
 
-});
+    });
+
+    $(document).on("click", "#prenotazione", function() {
+
+        var azione = "showPrenotazione";
+
+        $.post("ModificaServlet", {azione:azione},
+            function (data) {
+                $("#loggato").html(data);
+
+
+            },
+
+
+        );
+
+    });
 
 
 </script>

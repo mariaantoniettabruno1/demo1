@@ -71,18 +71,24 @@ public class ModificaServlet extends HttpServlet {
             else{
                     out.println("Le variabili del docente sono nulle.");
                     }*/
-            if(azione.equals("login")){
-                if(user!=null && password!=null) {
-                    if (DAO.checkAcc("" + user, "" + password).equals("amministratore")) {
-                        out.println("Loggato come amministratore");
-                    }
-                    else if(DAO.checkAcc("" + user, "" + password).equals("cliente")){
-                        out.println("<pclass='w-25 p-3 position-absolute top-0 start-50 translate-middle'>Sei loggato come Utente</p>");
-                        out.println("<button type='button' class='btn btn-primary' id='ripetizioni' >Ripetizioni Disponibili</button>");
-                        out.println("<button type='button' class='btn btn-primary' id='prenotazione'>Cronologia Prenotazioni</button>");
-
-                    }
+            if(azione.equals("checkACC")){
+                s.setAttribute("Utente", user);
+                s.setAttribute("Password", password);
+                String valido = (DAO.checkAcc("" + user, "" + password));
+                if(valido.equals("cliente")){
+                    out.println("<p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>");
+                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>");
+                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>");
+                    out.println("<div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>");
                 }
+                else if(valido.equals("amministratore")) {
+                    out.println("<p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Admin</p>");
+                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' >Ripetizioni Disponibili</button>");
+                    out.println("<button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'>Cronologia Prenotazioni</button>");
+                    out.println("<div  id='loggato' class='position-absolute top-50 start-50 translate-middle'></div>");
+                }
+
+
             }
             else if(azione.equals("showRipetizioni")){
                 out.println("test");
