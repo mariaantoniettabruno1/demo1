@@ -33,7 +33,7 @@
 
 </div>
 <script>
-    // script Vue
+    // script Vue.js
 
     Vue.component('App', App);
     Vue.component('Bottoni',Bottoni);
@@ -154,7 +154,7 @@ $(document).on("click", "#logga", function() { // When HTML DOM "click" event is
 });
 
 
-    $(document).on("click", "#ripetizioni", function() {
+    $(document).on("click", "#ripetizioni", function () {
 
     clear();
 
@@ -183,7 +183,7 @@ $(document).on("click", "#logga", function() { // When HTML DOM "click" event is
 
         var azione = "showPrenotazione";
 
-        $.post("ModificaServlet", {azione:azione},
+        $.post("ModificaServlet", {azione: azione},
             function (data) {
                 $("#loggato").html(data);
 
