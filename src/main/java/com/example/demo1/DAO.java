@@ -1,5 +1,7 @@
 package com.example.demo1;
 import java.sql.*;
+import java.util.ArrayList;
+
 
 public class DAO {
     private static final String url = "jdbc:mysql://localhost:3306/test?useSSL=false";
@@ -249,6 +251,7 @@ public class DAO {
     }
 
     public static String showInsegna() throws SQLException {
+
         Connection conn = DriverManager.getConnection(url, user, password);
         Statement st = conn.createStatement();
         ResultSet rs;
@@ -263,27 +266,84 @@ public class DAO {
         st.close();
         conn.close();
         return out;
+
+
     }
 
-    public static String showRipetizioni() throws SQLException {
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
-        ResultSet rs;
-        String out = "";
-        out = out + "Tabella ripetizioni: " + "\n";
-        rs = st.executeQuery("SELECT * FROM ripetizioni");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") +
-                    ", Data= "+rs.getDate("Data")+", Ora= "+rs.getTime("Ora")+", Disponibilita= "+rs.getString("disponibilita")+"\n";
+   public static ArrayList<Ripetizioni> showRipetizioni() {
+       Connection conn = null;
+       ArrayList<Ripetizioni> out = new ArrayList<>();
+       Ripetizioni rip;
+
+       try {
+           conn = DriverManager.getConnection(url, user, password);
+           if (conn != null) {
+               System.out.println("Connected to the database test");
+           }
+
+           Statement st = conn.createStatement();
+
+           ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, Data, Ora, disponibilita " +
+                                              "FROM docente, ripetizioni " +
+                                              "WHERE docente.idDocente = ripetizioni.idDocente; ");
+
+           while (rs.next()) {
+               rip = new Ripetizioni(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Disponibilita"));
+               out.add(rip);
+           }
+
+       } catch (SQLException e) {
+           System.out.println(e.getMessage());
+       }
+       finally {
+           if (conn != null) {
+               try {
+                   conn.close();
+               } catch (SQLException e2) {
+                   System.out.println(e2.getMessage());
+               }
+           }
+       }
+       return out;
+   }
+
+
+    public static ArrayList<Prenotazione> showPrenotazione(String account) throws SQLException {
+        Connection conn = null;
+        ArrayList<Prenotazione> out = new ArrayList<>();
+        Prenotazione pre;
+
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
+
+            Statement st = conn.createStatement();
+
+            ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, account, Data, Ora, stato " +
+                    "FROM prenotazione, docente " +
+                    "WHERE prenotazione.account ='"+account+"' AND docente.idDocente = prenotazione.idDocente; ");
+
+            while (rs.next()) {
+                pre = new Prenotazione(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Disponibilita"));
+                out.add(pre);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
+        finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
         return out;
-    }
-
-    public static String showPrenotazione(String account) throws SQLException {
+        /*
         Connection conn = DriverManager.getConnection(url, user, password);
         Statement st = conn.createStatement();
         ResultSet rs;
@@ -298,7 +358,7 @@ public class DAO {
         rs.close();
         st.close();
         conn.close();
-        return out;
+        return out;*/
     }
 
 }

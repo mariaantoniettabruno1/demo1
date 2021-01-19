@@ -4,45 +4,47 @@
     <meta charset="UTF-8">
     <title>Unito</title>
     <!-- import Vue, Ajax, BootsTrap, javascript e css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"><!-- BootsTrap -->
+    <link href="Style.css" rel="stylesheet"> <!-- Nostro css -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> <!-- Vue -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- Ajax -->
-    <script src="jquery.session.js"></script> <!-- jquery session -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- BootsTrap -->
-    <link href="Style.css" rel="stylesheet"> <!-- Nostro css -->
 </head>
 <body>
 <div id="app">
+
     <loginform ref="templateApp"></loginform>
     <bottoni ref="templateBottoni"></bottoni>
+    <div id="loggato" class="container align-middle col-8 hide" > supercalifragilistichespiralidoso </div>
+
 </div>
+
 <script>
 
     // script Vue.js
 
     //componente e template per l'html del form di login, compreso di logica dei bottoni e richiamo della servlet.
-    var loginFormJS = Vue.component('loginform',{
+    var loginFormJS = Vue.component('loginform', {
 
         template: `
-<div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
+          <div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
 
-    <form v-on:submit.prevent="login">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" aria-describedby="emailHelp" id="username" required autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-             <input type="password" class="form-control" id="password" required autocomplete="off">
-        </div>
-        <input type="submit" class="btn btn-primary" id="logga" value="login">
-    </form>
-
-    <div id="loggato"></div>
-</div>
-    `,
+          <form v-on:submit.prevent="login">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" aria-describedby="emailHelp" id="username" required
+                     autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" required autocomplete="off">
+            </div>
+            <input type="submit" class="btn btn-primary" id="logga" value="login">
+          </form>
+          </div>
+        `,
         data() {
             return {
-                isActive:true
+                isActive: true
             };
         }
         ,
@@ -51,7 +53,7 @@
                 this.isActive = !this.isActive;
             },
 
-            login(){
+            login() {
                 var utente = document.getElementById("username").value;
                 var password = document.getElementById("password").value;
 
@@ -60,15 +62,18 @@
 
                 var ruolo = "";
                 var self = this;
-                $.post("ModificaServlet", {utente: utente, password: password, azione: azione}, function (ServletOutput) {
+                $.post("ModificaServlet", {
+                    utente: utente,
+                    password: password,
+                    azione: azione
+                }, function (ServletOutput) {
 
                     self.ruolo = ServletOutput;
 
-                    if( self.ruolo.trim() === "cliente" || self.ruolo.trim() === "amministratore"){
+                    if (self.ruolo.trim() === "cliente" || self.ruolo.trim() === "amministratore") {
                         self.showForm();
                         vm.$refs.templateBottoni.passaRuolo(self.ruolo.trim());
-                    }
-                    else{
+                    } else {
                         alert("Utente non registrato");
                     }
 
@@ -79,68 +84,141 @@
     });
 
     //componente e template per l'html dei bottoni che appaiono una volta loggato, compresi di logica e richiami della servlet.
-    var bottoniJS = Vue.component('bottoni',{
+    var bottoniJS = Vue.component('bottoni', {
         template: `
-        <div v-if="ruolo.trim() === 'cliente'">
-        <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>
-        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' v-on:click="showRipetizioni">Ripetizioni Disponibili</button>
-        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'   v-on:click="showPrenotazione">Cronologia Prenotazioni</button>
-        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'> {{ stampa }} </div>
-        </div>
+          <div v-if="ruolo.trim() === 'cliente'">
+          <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>
+          <button type='button' class='btn btn-primary position-absolute top-0 start-50 ' id='ripetizioni'
+                  v-on:click="showRipetizioni">Ripetizioni Disponibili
+          </button>
+          <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'
+                  v-on:click="showPrenotazione">Cronologia Prenotazioni
+          </button>
+          </div>
 
-        <div v-else-if="ruolo.trim() === 'amministratore'">
-        <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Amministratore</p>
-        <button type='button' class='btn btn-primary position-absolute top-0 start-50 '  id='ripetizioni' v-on:click="showRipetizioni">Ripetizioni Disponibili</button>
-        <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'   v-on:click="showPrenotazione">Cronologia Prenotazioni</button>
-        <div  id='loggato' class='position-absolute top-50 start-50 translate-middle'> {{ stampa }}</div>
-        </div>
+          <div v-else-if="ruolo.trim() === 'amministratore'">
+          <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Amministratore</p>
+          <button type='button' class='btn btn-primary position-absolute top-0 start-50 ' id='ripetizioni'
+                  v-on:click="showRipetizioni">Ripetizioni Disponibili
+          </button>
+          <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'
+                  v-on:click="showPrenotazione">Cronologia Prenotazioni
+          </button>
+          </div>
         `,
-        data(){
+        data() {
             return {
-                ruolo : "",
-                stampa : ""
+                ruolo: "",
+                stampa: "",
             };
         }
-    ,
+        ,
         methods: {
             showForm() {
                 this.isActive = !this.isActive;
             },
 
-            passaRuolo(s){
+            passaRuolo(s) {
                 this.ruolo = s;
             },
 
-            showRipetizioni(){
+            showRipetizioni() {
                 var azione = "showRipetizioni";
-
                 var self = this;
+                var result = "";
+                var tabella = "";
+                var i = 1;
 
                 $.post("ModificaServlet", {azione: azione},
                     function (ServletOutput) {
 
-                        self.stampa = ServletOutput;
+                        result= $.parseJSON(ServletOutput);
 
-                        $("#loggato").html(self.stampa);
-                        console.log(self.stampa)
-                    },
+                        console.log(ServletOutput);
+
+                        tabella='<table class="table">\
+                                   <thead>\
+                                        <tr>\
+                                            <th scope="col">#</th>\
+                                            <th scope="col">Nome</th>\
+                                            <th scope="col">Cognome</th>\
+                                            <th scope="col">Materia</th>\
+                                            <th scope="col">Data</th>\
+                                            <th scope="col">Ora</th>\
+                                            <th scope="col">Disponibile</th>\
+                                        </tr>\
+                                   </thead>\
+                                   <tbody>';
+
+
+                        $.each( result, function( key, value ) {
+                            tabella += "  <tr>\
+                                        <th scope='row'>"+i+"</th>\
+                                            <td>"+value['nome']+"</td>\
+                                            <td>"+value['cognome']+"</td>\
+                                            <td>"+value['materia']+"</td>\
+                                            <td>"+value['data']+"</td>\
+                                            <td>"+value['ora']+"</td>\
+                                            <td>"+value['disponibilita']+"</td>\
+                                        </tr>";
+                            i++;
+                        });
+
+                        tabella += '</tbody>\n' +
+                            '</table>';
+                        $("#loggato").css({"visibility": "visible"});
+                        $("#loggato").html(tabella);
+                    }
                 );
             },
 
-            showPrenotazione(){
+            showPrenotazione() {
                 var azione = "showPrenotazione";
-
                 var self = this;
-                var stampa = "";
+                var result = "";
+                var tabella = "";
+                var i = 1;
 
                 $.post("ModificaServlet", {azione: azione},
                     function (ServletOutput) {
 
-                        self.stampa = ServletOutput;
+                        result= $.parseJSON(ServletOutput);
 
-                        $("#loggato").html(self.stampa);
-                        console.log(self.stampa)
-                    },
+                        console.log(ServletOutput);
+
+                        tabella='<table class="table">\
+                                   <thead>\
+                                        <tr>\
+                                            <th scope="col">#</th>\
+                                            <th scope="col">Nome</th>\
+                                            <th scope="col">Cognome</th>\
+                                            <th scope="col">Materia</th>\
+                                            <th scope="col">Data</th>\
+                                            <th scope="col">Ora</th>\
+                                            <th scope="col">Disponibile</th>\
+                                        </tr>\
+                                   </thead>\
+                                   <tbody>';
+
+
+                        $.each( result, function( key, value ) {
+                            tabella += "  <tr>\
+                                        <th scope='row'>"+i+"</th>\
+                                            <td>"+value['nome']+"</td>\
+                                            <td>"+value['cognome']+"</td>\
+                                            <td>"+value['materia']+"</td>\
+                                            <td>"+value['data']+"</td>\
+                                            <td>"+value['ora']+"</td>\
+                                            <td>"+value['disponibilita']+"</td>\
+                                        </tr>";
+                            i++;
+                        });
+
+                        tabella += '</tbody>\n' +
+                            '</table>';
+                        $("#loggato").css({"visibility": "visible"});
+                        $("#loggato").html(tabella);
+                    }
                 );
 
             }
@@ -159,35 +237,71 @@
     function isEmpty(el) {
         return !$.trim(el.html())
     }
-/*
-    $(document).on("click", "#ripetizioni", function () {
 
-        var azione = "showRipetizioni";
+    /*
+            $(document).on("click", "#ripetizioni", function () {
 
-        $.post("ModificaServlet", {azione: azione},
-            function (data) {
-                $("#loggato").html(data);
-            },
-        );
-    });
+                var azione = "showRipetizioni";
+                    var self = this;
+                    var result = "";
+                    var tabella = "";
+                    var i = 1;
 
-    $(document).on("click", "#prenotazione", function() {
+                    $.post("ModificaServlet", {azione: azione},
+                        function (ServletOutput) {
 
-        var azione = "showPrenotazione";
+                            result= $.parseJSON(ServletOutput);
 
-        $.post("ModificaServlet", {azione: azione},
-            function (data) {
-                $("#loggato").html(data);
-            },
-        );
-    });
+                            console.log(ServletOutput);
 
-    //script Javascript
-    function clear() {
-        document.getElementById("loggato").innerHTML = "";
-        document.getElementById("app").innerHTML = "";
-    }*/
+                            tabella='<table class="table">\
+                                       <thead>\
+                                            <tr>\
+                                                <th scope="col">#</th>\
+                                                <th scope="col">Nome</th>\
+                                                <th scope="col">Cognome</th>\
+                                                <th scope="col">Materia</th>\
+                                                <th scope="col">Data</th>\
+                                                <th scope="col">Ora</th>\
+                                                <th scope="col">Disponibile</th>\
+                                            </tr>\
+                                       </thead>\
+                                       <tbody>';
+
+
+                            $.each( result, function( key, value ) {
+                                tabella += "  <tr>\
+                                            <th scope='row'>"+i+"</th>\
+                                                <td>"+value['nome']+"</td>\
+                                                <td>"+value['cognome']+"</td>\
+                                                <td>"+value['materia']+"</td>\
+                                                <td>"+value['data']+"</td>\
+                                                <td>"+value['ora']+"</td>\
+                                                <td>"+value['disponibilita']+"</td>\
+                                            </tr>";
+                                i++;
+                            });
+
+                            tabella += '</tbody>\n' +
+                                     '</table>';
+                            $("#loggato").css({"visibility": "visible"});
+                            $("#loggato").html(tabella);
+                    },
+                );
+            });
+
+            $(document).on("click", "#prenotazione", function() {
+
+                var azione = "showPrenotazione";
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (data) {
+                        $("#loggato").html(data);
+                    },
+                );
+            });
+    */
 </script>
 
 </body>
- </html>
+</html>

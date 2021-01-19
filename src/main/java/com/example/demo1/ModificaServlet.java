@@ -1,5 +1,8 @@
 package com.example.demo1;
 
+import com.google.gson.Gson;
+import org.json.JSONArray;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
@@ -7,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.ServerException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet(name = "ModificaServlet", urlPatterns = {"/ModificaServlet"})
 public class ModificaServlet extends HttpServlet {
@@ -40,38 +44,6 @@ public class ModificaServlet extends HttpServlet {
             String user = request.getParameter("utente");
             String password = request.getParameter("password");
             String azione = request.getParameter("azione");
-/*
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title> Modifica della Servlet </title>");
-            out.println("</head>");
-            out.println("<body>");
-            if(nomeCorso!=null){
-                DAO.insertCorso(""+nomeCorso+"");
-                out.println("Corso "+nomeCorso+"Aggiunto");
-            }
-       else*/
-            /*
-                if(nomeDocente!=null && cognomeDocente!=null){
-                if(user!=null && password!=null) {
-                    if (DAO.checkAcc(""+user,""+password).equals("amministratore")) {
-                        DAO.insertDocente("" + nomeDocente, "" + cognomeDocente);
-                        out.println("Docente " + nomeDocente + " " + cognomeDocente + " Aggiunto. <br>");
-                        out.println("Loggato come amministratore");
-                    }
-                    else {
-                        //out.println(document.getElementById("cap").value = risp);
-                        out.println("I dati inseriti sono sbagliati o non disponi delle autorizzazioni necessarie");
-                    }
-                }
-                else{
-                    out.println("Le variabili dell'account sono nulle.");
-                }
-            }
-            else{
-                    out.println("Le variabili del docente sono nulle.");
-                    }*/
             if(azione.equals("checkACC")){
                 s.setAttribute("Utente", user);
                 s.setAttribute("Password", password);
@@ -81,29 +53,19 @@ public class ModificaServlet extends HttpServlet {
 
             }
             else if(azione.equals("showRipetizioni")){
-                out.println(DAO.showRipetizioni());
+                Gson gson = new Gson();
+                String jsonArray = gson.toJson(DAO.showRipetizioni());
+                out.println(jsonArray);
             }
             else if(azione.equals("showPrenotazione")){
-                out.println(DAO.showPrenotazione(s.getAttribute("Utente").toString()));
+                Gson gson = new Gson();
+                String jsonArray = gson.toJson(DAO.showPrenotazione(s.getAttribute("Utente").toString()));
+                out.println(jsonArray);
             }
 
 
             s.setAttribute("user",user);
             String url = response.encodeURL("ModificaServlet");
-            /*
-            String azione = request.getParameter("action");
-            if (azione!=null && azione.equals("invalida")) {
-                s.invalidate();
-                out.println("<p>Sessione invalidata!</p>");
-                out.println("<p>Ricarica <a href=\"" + url + "\"> la pagina</a></p>");
-            }
-            else{
-                out.println("<p>Invalida <a href=\"" + url + "?action=invalida\"> la sessione</a></p>");
-                out.println("<p>Ricarica <a href=\"" + url + "\"> la pagina</a></p>");
-            }
-
-            out.println("<body>");
-            out.println("</html>");*/
         } catch (IOException e) {
             e.printStackTrace();
         }
