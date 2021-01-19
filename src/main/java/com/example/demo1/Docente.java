@@ -1,14 +1,16 @@
 package com.example.demo1;
 
 public class Docente {
+    private int id;
     private String nome;
     private String cognome;
-    private int id;
 
-    public Docente(String nome, String cognome, int id) {
+
+    public Docente(int id, String nome, String cognome) {
+        this.id = id;
         this.nome = nome;
         this.cognome = cognome;
-        this.id = id;
+
     }
     public String getNome() {
         return nome;
@@ -22,4 +24,12 @@ public class Docente {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return  "{ " +
+                "\"id\": " + "\""+this.getIdDocente()+"\", " +
+                "\"Nome\": " + "\""+this.getNome()+"\", " +
+                "\"Cognome\": " + "\""+this.getCognome()+"\", " +
+                " }";
+    }
 }

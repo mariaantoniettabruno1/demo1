@@ -63,8 +63,6 @@ public class ModificaServlet extends HttpServlet {
                 out.println(jsonArray);
             }
 
-
-            s.setAttribute("user",user);
             String url = response.encodeURL("ModificaServlet");
         } catch (IOException e) {
             e.printStackTrace();

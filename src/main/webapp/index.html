@@ -14,7 +14,7 @@
 
     <loginform ref="templateApp"></loginform>
     <bottoni ref="templateBottoni"></bottoni>
-    <div id="loggato" class="container align-middle col-8 hide" > supercalifragilistichespiralidoso </div>
+    <div id="loggato" class="container align-middle col-8 hide" ></div>
 
 </div>
 
@@ -170,8 +170,124 @@
                         $("#loggato").html(tabella);
                     }
                 );
-            },
 
+            },
+            showDocente(){
+                var azione = "showDocente";
+                var self = this;
+                var result = "";
+                var tabella = "";
+                var i = 1;
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (ServletOutput) {
+
+                        result = $.parseJSON(ServletOutput);
+
+                        console.log(ServletOutput);
+
+                        tabella = '<table class="table">\
+                                   <thead>\
+                                        <tr>\
+                                           \<th scope="col">idDocente</th>\
+                                            <th scope="col">Nome</th>\
+                                            <th scope="col">Cognome</th>\
+                                        </tr>\
+                                   </thead>\
+                                   <tbody>';
+
+
+                        $.each(result, function (key, value) {
+                            tabella += "  <tr>\
+                                            <td>" + value['id'] + "</td>\
+                                            <td>" + value['nome'] + "</td>\
+                                            <td>" + value['cognome'] + "</td>\
+                                        </tr>";
+                            i++;
+                        });
+
+                        tabella += '</tbody>\n' +
+                            '</table>';
+                        $("#loggato").css({"visibility": "visible"});
+                        $("#loggato").html(tabella);
+                    }
+                )
+            },
+            showInsegna(){
+                var azione = "showInsegna";
+                var self = this;
+                var result = "";
+                var tabella = "";
+                var i = 1;
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (ServletOutput) {
+
+                        result = $.parseJSON(ServletOutput);
+
+                        console.log(ServletOutput);
+
+                        tabella = '<table class="table">\
+                                   <thead>\
+                                        <tr>\
+                                           \<th scope="col">idDocente</th>\
+                                            \<th scope="col">Corso</th>\
+                                        </tr>\
+                                   </thead>\
+                                   <tbody>';
+
+
+                        $.each(result, function (key, value) {
+                            tabella += "  <tr>\
+                                            \<td>" + value['idDocente'] + "</td>\
+                                            \<td>" + value['materia'] + "</td>\
+                                        </tr>";
+                            i++;
+                        });
+
+                        tabella += '</tbody>\n' +
+                            '</table>';
+                        $("#loggato").css({"visibility": "visible"});
+                        $("#loggato").html(tabella);
+                    }
+                )
+            },
+            showCorso(){
+                var azione = "showCorso";
+                var self = this;
+                var result = "";
+                var tabella = "";
+                var i = 1;
+
+                $.post("ModificaServlet", {azione: azione},
+                    function (ServletOutput) {
+
+                        result = $.parseJSON(ServletOutput);
+                        console.log(ServletOutput);
+
+                        tabella = '<table class="table">\
+                                   <thead>\
+                                        <tr>\
+                                           \<th scope="col">Materia</th>\
+                                        </tr>\
+                                   </thead>\
+                                   <tbody>';
+
+
+                        $.each(result, function (key, value) {
+                            tabella += "  <tr>\
+                                            <td>" + value['Materia'] + "</td>\
+                                        </tr>";
+                            i++;
+                        });
+
+                        tabella += '</tbody>\n' +
+                            '</table>';
+                        $("#loggato").css({"visibility": "visible"});
+                        $("#loggato").html(tabella);
+                    }
+                )
+            },
             showPrenotazione() {
                 var azione = "showPrenotazione";
                 var self = this;
@@ -195,7 +311,7 @@
                                             <th scope="col">Materia</th>\
                                             <th scope="col">Data</th>\
                                             <th scope="col">Ora</th>\
-                                            <th scope="col">Disponibile</th>\
+                                            <th scope="col">Stato</th>\
                                         </tr>\
                                    </thead>\
                                    <tbody>';
@@ -203,13 +319,13 @@
 
                         $.each( result, function( key, value ) {
                             tabella += "  <tr>\
-                                        <th scope='row'>"+i+"</th>\
-                                            <td>"+value['nome']+"</td>\
-                                            <td>"+value['cognome']+"</td>\
-                                            <td>"+value['materia']+"</td>\
-                                            <td>"+value['data']+"</td>\
-                                            <td>"+value['ora']+"</td>\
-                                            <td>"+value['disponibilita']+"</td>\
+                                        <th scope='row'>" + i + "</th>\
+                                            <td>" + value['nome'] + "</td>\
+                                            <td>" + value['cognome'] + "</td>\
+                                            <td>" + value['materia'] + "</td>\
+                                            <td>" + value['data'] + "</td>\
+                                            <td>" + value['ora'] + "</td>\
+                                            <td>" + value['stato'] + "</td>\
                                         </tr>";
                             i++;
                         });
@@ -238,69 +354,10 @@
         return !$.trim(el.html())
     }
 
-    /*
-            $(document).on("click", "#ripetizioni", function () {
 
-                var azione = "showRipetizioni";
-                    var self = this;
-                    var result = "";
-                    var tabella = "";
-                    var i = 1;
-
-                    $.post("ModificaServlet", {azione: azione},
-                        function (ServletOutput) {
-
-                            result= $.parseJSON(ServletOutput);
-
-                            console.log(ServletOutput);
-
-                            tabella='<table class="table">\
-                                       <thead>\
-                                            <tr>\
-                                                <th scope="col">#</th>\
-                                                <th scope="col">Nome</th>\
-                                                <th scope="col">Cognome</th>\
-                                                <th scope="col">Materia</th>\
-                                                <th scope="col">Data</th>\
-                                                <th scope="col">Ora</th>\
-                                                <th scope="col">Disponibile</th>\
-                                            </tr>\
-                                       </thead>\
-                                       <tbody>';
-
-
-                            $.each( result, function( key, value ) {
-                                tabella += "  <tr>\
-                                            <th scope='row'>"+i+"</th>\
-                                                <td>"+value['nome']+"</td>\
-                                                <td>"+value['cognome']+"</td>\
-                                                <td>"+value['materia']+"</td>\
-                                                <td>"+value['data']+"</td>\
-                                                <td>"+value['ora']+"</td>\
-                                                <td>"+value['disponibilita']+"</td>\
-                                            </tr>";
-                                i++;
-                            });
-
-                            tabella += '</tbody>\n' +
-                                     '</table>';
-                            $("#loggato").css({"visibility": "visible"});
-                            $("#loggato").html(tabella);
-                    },
-                );
-            });
-
-            $(document).on("click", "#prenotazione", function() {
-
-                var azione = "showPrenotazione";
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (data) {
-                        $("#loggato").html(data);
-                    },
-                );
-            });
-    */
+    $( "#prenota" ).click(function() {
+        alert( "test" );
+    });
 </script>
 
 </body>

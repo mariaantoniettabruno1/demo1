@@ -141,7 +141,7 @@ public class DAO {
     }
 
     //l'eliminazione di una prenotazione
-    public static void deletePrenotazione(int idDocente, String Materia, String account, String Data, String Ora) throws SQLException {
+    public static void deletePrenotazione( String idDocente, String Materia, String account, Date Data, Time Ora) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
         st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'disdetta'  WHERE idDocente=" + idDocente + " AND Materia='" + Materia + "' AND Account='" + account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
@@ -168,22 +168,15 @@ public class DAO {
 
     }
 
-    public static void PrenotazioneEffettuata(int idDocente, String Materia, String Account, String Data, String Ora) throws SQLException{
+    public static void PrenotazioneEffettuata(ArrayList<Prenotazione> id, ArrayList<Prenotazione> Materia, ArrayList<Prenotazione> Account, ArrayList<Prenotazione> Data, ArrayList<Prenotazione> Ora) throws SQLException{
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
-        /*
-        ResultSet rs = st.executeQuery("SELECT * FROM prenotazione WHERE idDocente="+idDocente+"");
-        int idDocente = rs.getInt("idDocente");
-        String Materia = rs.getString("Materia");
-        String Account = rs.getString("Account");
-        String Data = rs.getString("Data");
-        String Ora = rs.getString("Ora");
-        */
-        st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'effettuata'  WHERE idDocente=" + idDocente + " AND Materia='" + Materia + "' AND Account='" + Account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
+
+        st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'effettuata'  WHERE idDocente=" + id + " AND Materia='" + Materia + "' AND Account='" + Account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
         st.close();
         connection.close();
     }
-    public static String queryDB() throws SQLException {
+   /* public static String queryDB() throws SQLException {
         Connection conn = DriverManager.getConnection(url, user, password);
         Statement st = conn.createStatement();
         ResultSet rs;
@@ -215,56 +208,122 @@ public class DAO {
         conn.close();
         return out;
     }
+    */
 
-    public static String showDocente() throws SQLException {
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
+
+    public static ArrayList <Docente> showDocente() throws SQLException {
+        Connection conn = null;
+        ArrayList<Docente> out = new ArrayList<>();
         ResultSet rs;
-        String out = "";
-        out = out + "Tabella Docente: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Docente");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Nome = " + rs.getString("NOME") + "\n";
+        Docente doc;
+
+        try {
+             conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
+
+            Statement st = conn.createStatement();
+
+            rs = st.executeQuery("SELECT * FROM Docente");
+
+            while (rs.next()) {
+                doc = new Docente(rs.getInt("idDocente") ,rs.getString("Nome"),rs.getString("Cognome"));
+                out.add(doc);
+            }
+            rs.close();
+            st.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
+        finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
         return out;
     }
 
-    public static String showCorso() throws SQLException {
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
+    public static ArrayList<Corso> showCorso() throws SQLException {
+        Connection conn = null;
+        ArrayList<Corso> out = new ArrayList<>();
         ResultSet rs;
-        String out = "";
-        out = out + "Tabella Corso: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Corso");
-        while (rs.next()) {
-            out = out + "nomeCorso= " + rs.getString("Materia") + "\n";
+        Corso corso;
+
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
+
+            Statement st = conn.createStatement();
+
+            rs = st.executeQuery("SELECT * FROM Corso");
+
+            while (rs.next()) {
+                corso = new Corso(rs.getString("Materia") );
+                out.add(corso);
+            }
+            rs.close();
+            st.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
+        finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
         return out;
     }
 
-    public static String showInsegna() throws SQLException {
-
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
+    public static ArrayList<Insegna> showInsegna() throws SQLException {
+        Connection conn = null;
+        ArrayList<Insegna> out = new ArrayList<>();
         ResultSet rs;
-        String out = "";
-        out = out + "Tabella Insegna: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Insegna");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + "\n";
+        Insegna ins;
+
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
+
+            Statement st = conn.createStatement();
+
+            /*rs = st.executeQuery("SELECT Nome,Cognome,Materia" +
+                                     "FROM Insegna,Docente" +"WHERE Docente.idDocente = Insegna.idDocente;");*/
+            rs = st.executeQuery("SELECT * FROM Insegna");
+
+            while (rs.next()) {
+                ins = new Insegna(rs.getInt("idDocente"),rs.getString("Materia") );
+                out.add(ins);
+            }
+            rs.close();
+            st.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
+        finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
         return out;
 
 
@@ -326,10 +385,12 @@ public class DAO {
                     "WHERE prenotazione.account ='"+account+"' AND docente.idDocente = prenotazione.idDocente; ");
 
             while (rs.next()) {
-                pre = new Prenotazione(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Disponibilita"));
+                pre = new Prenotazione(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Stato"));
                 out.add(pre);
             }
-
+            rs.close();
+            st.close();
+            conn.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
