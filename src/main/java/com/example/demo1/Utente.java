@@ -5,7 +5,7 @@ public class Utente {
     private String password;
     private String ruolo;
 
-    public Utente(String account,String password, String ruolo) {
+    public Utente(String account, String password, String ruolo) {
         this.account = account;
         this.password = password;
         this.ruolo = ruolo;
@@ -22,12 +22,13 @@ public class Utente {
     public String getRuolo() {
         return ruolo;
     }
+
     @Override
     public String toString() {
-        return  "{ " +
-                "\"Account\": " + "\""+this.getAccount()+"\", " +
-                "\"Password\": " + "\""+this.getPassword()+"\", " +
-                "\"Ruolo\": " + "\""+this.getRuolo()+"\", " +
+        return "{ " +
+                "\"Account\": " + "\"" + this.getAccount() + "\", " +
+                "\"Password\": " + "\"" + this.getPassword() + "\", " +
+                "\"Ruolo\": " + "\"" + this.getRuolo() + "\", " +
                 " }";
     }
 }

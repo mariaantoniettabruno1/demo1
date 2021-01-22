@@ -14,8 +14,8 @@ public class Corso {
 
     @Override
     public String toString() {
-        return  "{ " +
-                "\"Corso\": " + "\""+this.getMateria()+"\", " +
+        return "{ " +
+                "\"Corso\": " + "\"" + this.getMateria() + "\", " +
                 " }";
     }
 

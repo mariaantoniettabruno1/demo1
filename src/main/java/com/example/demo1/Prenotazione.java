@@ -12,7 +12,6 @@ public class Prenotazione {
     private String stato;
 
 
-
     public Prenotazione(String nome, String cognome, String materia, java.sql.Date data, Time ora, String stato) {
         this.nome = nome;
         this.cognome = cognome;
@@ -20,6 +19,7 @@ public class Prenotazione {
         this.data = data;
         this.ora = ora;
         this.stato = stato;
+
     }
 
     public String getNome() {
@@ -46,15 +46,16 @@ public class Prenotazione {
         return stato;
     }
 
+
     @Override
     public String toString() {
-        return  "{ " +
-                "\"Nome\": " + "\""+this.getNome()+"\", " +
-                "\"Cognome\": " + "\""+this.getCognome()+"\", " +
-                "\"Materia\": " + "\""+this.getMateria()+"\", " +
-                "\"Data\": " + "\""+this.getData()+"\", " +
-                "\"Ora\": " + "\""+this.getOra()+"\", " +
-                "\"Stato\": " + "\""+this.getStato()+"\"" +
+        return "{ " +
+                "\"Nome\": " + "\"" + this.getNome() + "\", " +
+                "\"Cognome\": " + "\"" + this.getCognome() + "\", " +
+                "\"Materia\": " + "\"" + this.getMateria() + "\", " +
+                "\"Data\": " + "\"" + this.getData() + "\", " +
+                "\"Ora\": " + "\"" + this.getOra() + "\", " +
+                "\"Stato\": " + "\"" + this.getStato() + "\"" +
                 " }";
     }
 }

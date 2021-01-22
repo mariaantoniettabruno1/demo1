@@ -1,4 +1,5 @@
 package com.example.demo1;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -141,7 +142,7 @@ public class DAO {
     }
 
     //l'eliminazione di una prenotazione
-    public static void deletePrenotazione( String idDocente, String Materia, String account, Date Data, Time Ora) throws SQLException {
+    public static void deletePrenotazione(String idDocente, String Materia, String account, Date Data, Time Ora) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
         st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'disdetta'  WHERE idDocente=" + idDocente + " AND Materia='" + Materia + "' AND Account='" + account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
@@ -168,7 +169,7 @@ public class DAO {
 
     }
 
-    public static void PrenotazioneEffettuata(ArrayList<Prenotazione> id, ArrayList<Prenotazione> Materia, ArrayList<Prenotazione> Account, ArrayList<Prenotazione> Data, ArrayList<Prenotazione> Ora) throws SQLException{
+    public static void PrenotazioneEffettuata(ArrayList<Prenotazione> id, ArrayList<Prenotazione> Materia, ArrayList<Prenotazione> Account, ArrayList<Prenotazione> Data, ArrayList<Prenotazione> Ora) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
 
@@ -211,14 +212,14 @@ public class DAO {
     */
 
 
-    public static ArrayList <Docente> showDocente() throws SQLException {
+    public static ArrayList<Docente> showDocente() throws SQLException {
         Connection conn = null;
         ArrayList<Docente> out = new ArrayList<>();
         ResultSet rs;
         Docente doc;
 
         try {
-             conn = DriverManager.getConnection(url, user, password);
+            conn = DriverManager.getConnection(url, user, password);
             if (conn != null) {
                 System.out.println("Connected to the database test");
             }
@@ -228,16 +229,15 @@ public class DAO {
             rs = st.executeQuery("SELECT * FROM Docente");
 
             while (rs.next()) {
-                doc = new Docente(rs.getInt("idDocente") ,rs.getString("Nome"),rs.getString("Cognome"));
+                doc = new Docente(rs.getInt("idDocente"), rs.getString("Nome"), rs.getString("Cognome"));
                 out.add(doc);
             }
             rs.close();
             st.close();
-            conn.close();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             if (conn != null) {
                 try {
                     conn.close();
@@ -266,16 +266,15 @@ public class DAO {
             rs = st.executeQuery("SELECT * FROM Corso");
 
             while (rs.next()) {
-                corso = new Corso(rs.getString("Materia") );
+                corso = new Corso(rs.getString("Materia"));
                 out.add(corso);
             }
             rs.close();
             st.close();
-            conn.close();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             if (conn != null) {
                 try {
                     conn.close();
@@ -306,16 +305,15 @@ public class DAO {
             rs = st.executeQuery("SELECT * FROM Insegna");
 
             while (rs.next()) {
-                ins = new Insegna(rs.getInt("idDocente"),rs.getString("Materia") );
+                ins = new Insegna(rs.getInt("idDocente"), rs.getString("Materia"));
                 out.add(ins);
             }
             rs.close();
             st.close();
-            conn.close();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             if (conn != null) {
                 try {
                     conn.close();
@@ -329,42 +327,44 @@ public class DAO {
 
     }
 
-   public static ArrayList<Ripetizioni> showRipetizioni() {
-       Connection conn = null;
-       ArrayList<Ripetizioni> out = new ArrayList<>();
-       Ripetizioni rip;
+    public static ArrayList<Ripetizioni> showRipetizioni() {
+        Connection conn = null;
+        ArrayList<Ripetizioni> out = new ArrayList<>();
+        Ripetizioni rip;
 
-       try {
-           conn = DriverManager.getConnection(url, user, password);
-           if (conn != null) {
-               System.out.println("Connected to the database test");
-           }
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
 
-           Statement st = conn.createStatement();
+            Statement st = conn.createStatement();
 
-           ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, Data, Ora, disponibilita " +
-                                              "FROM docente, ripetizioni " +
-                                              "WHERE docente.idDocente = ripetizioni.idDocente; ");
+            ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, Data, Ora " +
+                    "FROM docente, ripetizioni " +
+                    "WHERE docente.idDocente = ripetizioni.idDocente " +
+                    "AND (ripetizioni.disponibilita='si' OR  ripetizioni.disponibilita='Si' OR ripetizioni.disponibilita='SI'); ");
 
-           while (rs.next()) {
-               rip = new Ripetizioni(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Disponibilita"));
-               out.add(rip);
-           }
+            while (rs.next()) {
+                rip = new Ripetizioni(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"));
+                out.add(rip);
+            }
+            rs.close();
+            st.close();
 
-       } catch (SQLException e) {
-           System.out.println(e.getMessage());
-       }
-       finally {
-           if (conn != null) {
-               try {
-                   conn.close();
-               } catch (SQLException e2) {
-                   System.out.println(e2.getMessage());
-               }
-           }
-       }
-       return out;
-   }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
+        return out;
+    }
 
 
     public static ArrayList<Prenotazione> showPrenotazione(String account) throws SQLException {
@@ -382,19 +382,19 @@ public class DAO {
 
             ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, account, Data, Ora, stato " +
                     "FROM prenotazione, docente " +
-                    "WHERE prenotazione.account ='"+account+"' AND docente.idDocente = prenotazione.idDocente; ");
-
+                    "WHERE prenotazione.account ='" + account + "' AND docente.idDocente = prenotazione.idDocente; ");
             while (rs.next()) {
-                pre = new Prenotazione(rs.getString("Nome") , rs.getString("Cognome"), rs.getString("Materia"),rs.getDate("Data"),rs.getTime("Ora"),rs.getString("Stato"));
+                pre = new Prenotazione(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"), rs.getString("Stato"));
                 out.add(pre);
             }
+
+
             rs.close();
             st.close();
-            conn.close();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             if (conn != null) {
                 try {
                     conn.close();
@@ -404,22 +404,45 @@ public class DAO {
             }
         }
         return out;
-        /*
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
-        ResultSet rs;
-        String out = "";
-        out = out + "Tabella prenotazioni: " + "\n";
-        rs = st.executeQuery("SELECT * FROM prenotazione WHERE prenotazione.account ='"+account+"'");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + ", account= "+rs.getString("account") +
-                    ", Data= "+rs.getDate("Data")+", Ora= "+rs.getTime("Ora")+", Stato= "+rs.getString("stato")+"\n";
+
+    }
+
+    public static ArrayList<Prenotazione> showPrenotazioneAmministratore() throws SQLException {
+        Connection conn = null;
+        ArrayList<Prenotazione> out = new ArrayList<>();
+        Prenotazione pre;
+
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            if (conn != null) {
+                System.out.println("Connected to the database test");
+            }
+
+            Statement st = conn.createStatement();
+
+            ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, Data, Ora, stato " +
+                    "FROM prenotazione, docente " +
+                    "WHERE docente.idDocente = prenotazione.idDocente; ");
+            while (rs.next()) {
+                pre = new Prenotazione(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"), rs.getString("Stato"));
+                out.add(pre);
+            }
+
+
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
         }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
-        return out;*/
+        return out;
     }
 
 }

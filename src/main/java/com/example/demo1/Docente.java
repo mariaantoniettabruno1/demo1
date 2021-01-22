@@ -12,24 +12,28 @@ public class Docente {
         this.cognome = cognome;
 
     }
+
     public String getNome() {
+
         return nome;
     }
 
     public String getCognome() {
+
         return cognome;
     }
 
     public int getIdDocente() {
+
         return id;
     }
 
     @Override
     public String toString() {
-        return  "{ " +
-                "\"id\": " + "\""+this.getIdDocente()+"\", " +
-                "\"Nome\": " + "\""+this.getNome()+"\", " +
-                "\"Cognome\": " + "\""+this.getCognome()+"\", " +
+        return "{ " +
+                "\"id\": " + "\"" + this.getIdDocente() + "\", " +
+                "\"Nome\": " + "\"" + this.getNome() + "\", " +
+                "\"Cognome\": " + "\"" + this.getCognome() + "\", " +
                 " }";
     }
 }
