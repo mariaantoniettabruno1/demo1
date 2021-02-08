@@ -7,17 +7,16 @@
     <!-- import della libreria Vuetify 2.4.3 per la grafica -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- import script ajax e jquery -->
-    <!--<script src="libs/vue-session.js"></script> import Vue session -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <!-- import del font family Roboto -->
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
     <!-- import icone e css di google (material design) -->
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
     <!-- import del css di Vuetify 2.4.3 -->
-    <link href="Style.css" rel="stylesheet">
+    <link rel="icon" href="icons/books.png">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" name="viewport">
     <meta charset="UTF-8">
-    <title>Progetto</title>
+    <title>UNITO</title>
 
 </head>
 <body>
@@ -29,29 +28,82 @@
 
 </body>
 <!-- import dei componenti dalla directory /components -->
+<script src="components/inputform.js"></script>
+<script src="components/operazioni.js"></script>
 <script src="components/home.js"></script>
 <script src="components/login.js"></script>
 <script src="components/cliente.js"></script>
+<script src="components/amministratore.js"></script>
 <script>
+    //sessionstorage per controllare i permessi
+    let myStorage = window.localStorage;
 
     //dichiarazione delle routes per i path dei component
     const routes = [
+        {path: "/inputform", component: InputformContainer, meta: {requiresAuth: true, requiresRuolo: "amministratore"}},
+        {path: "/operazioni", component: OperazioniContainer, meta: {requiresAuth: true}},
         {path: "/", component: HomeContainer},
         {path: "/login", component: LoginContainer},
-        {path: "/cliente", component: ClienteContainer},
-    ];
+        {path: "/cliente", component: ClienteContainer, meta: {requiresAuth: true, requiresRuolo: "cliente"}},
+        {path: "/amministratore", component: AmministratoreContainer, meta: {requiresAuth: true, requiresRuolo: "amministratore"}},
 
+        {path: "**", redirect : "/"},
+    ];
     //dichiarazione dei router per "muoversi" tra i componenti
     let router = new VueRouter({
         routes: routes
     });
 
-    //dichiarazione di Vue.js
-    new Vue({
-        el: '#app',
-        vuetify: new Vuetify(),
-        router
+    //controllo dei permessi
+    router.beforeEach((to, from, next) => {
+        const getRuolo = myStorage.getItem('ruolo');
+        const requiresCliente = to.meta.requiresRuolo == 'cliente';
+        const requiresAmministratore = to.meta.requiresRuolo == 'amministratore';
+            //se il prossimo componente richiede autorizzazioni, entra nell'if
+            if(to.matched.some(r => r.meta.requiresRuolo)){
+                //se non si è loggati, si fa il redirect alla pagina di login
+                if(getRuolo === null){
+                    return next({ path: '/login', query: { returnUrl: to.path } });
+                }
+                //altrimenti, se si è loggati si controlla se si dispone delle autizzazioni necessarie
+                else if(to.matched.some(s => s.meta.requiresRuolo)){
+                    if((getRuolo == 'cliente' && requiresCliente) || (getRuolo == 'amministratore' && requiresAmministratore)){
+                        return next();
+                    }
+                    // se si prova ad entrare in una pagina in cui non si hanno i permessi ( /amministratore con il ruolo di cliente )
+                    else{
+                        //redirect alla pagina del proprio ruolo
+                            return next({ path: "/"+getRuolo, query: { returnUrl: to.path } });
+                    }
+                }
+            }
+            else{
+                next();
+            }
+    });
 
+    //dichiarazione di vuetify
+    const vuetify = new Vuetify(
+        {
+        theme: {
+
+                dark: {
+                    primary: '#000000',
+                    secondary: '#b0bec5',
+                    accent: '#52BE80',
+                    error: '#b71c1c',
+
+                },
+
+        },
+    }
+    );
+
+    //dichiarazione di Vue.js
+    const vue = new Vue({
+        el: '#app',
+        vuetify,
+        router,
     })
 
 </script>

@@ -15,7 +15,6 @@ let LoginContainer = {
             show_password: false,
             ruolo: "",
             azione: "checkACC",
-
         }
     },
     template: `
@@ -52,18 +51,26 @@ let LoginContainer = {
     `,
     methods: {
         async login() {
-
+            //concetto simile a var self = this, assegnamo this.router cosi da poterlo richiamare in futuro.
             let navigate = this.$router;
+            //fetch per la query di login, passando utente, password e l'azione richiesta ( che in questo caso è check account)
             this.ruolo = await fetch(`ModificaServlet?azione=${this.azione}&utente=${this.username}&password=${this.password}`)
                 .then(function (response) {
-                    return response.json()
+                    return response.json(); // trasformiamo il response che ci viene dato dalla fetch in un oggetto json
                 })
                 .then(function (response) {
-                    return response.trim()
+                    return response.trim(); // togliamo i possibili spazi che andrebbero a creare problemi nel controllo del valore successivamente
                 });
+
+
+
             if (this.ruolo === 'cliente') {
+                myStorage.setItem('ruolo', this.ruolo); // settiamo il ruolo dell'utente nella sessione, per il controllo dei permessi con router
+                myStorage.setItem('utente', this.username); // uguale a sopra, ma per il nome utente
                 navigate.push({path: '/cliente'});
             } else if (this.ruolo === 'amministratore') {
+                myStorage.setItem('ruolo', this.ruolo); // settiamo il ruolo dell'utente nella sessione, per il controllo dei permessi con router
+                myStorage.setItem('utente', this.username); // uguale a sopra, ma per il nome utente
                 navigate.push({path: '/amministratore'});
             } else {
                 alert("Utente non registrato");

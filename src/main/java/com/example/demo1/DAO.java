@@ -1,7 +1,10 @@
 package com.example.demo1;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 
 
 public class DAO {
@@ -17,17 +20,15 @@ public class DAO {
         } catch (SQLException e) {
             System.out.println("Error in registerDriver" + e.getMessage());
         }
-        {
 
-        }
     }
 
     //inizio metodi insert
     //metodo per l'inserimento di un nuovo corso all'interno del database
-    public static void insertCorso(String Materia) throws SQLException {
+    public static int insertCorso(String Materia) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
-        st.executeUpdate("INSERT INTO CORSO(MATERIA) VALUES('" + Materia + "')");
+        int righe = st.executeUpdate("INSERT INTO CORSO(MATERIA) VALUES('" + Materia + "')");
         System.out.println("Aggiunta la riga " + Materia);
         st.close();
         connection.close();
@@ -44,8 +45,11 @@ public class DAO {
     }
 
     //metodo per l'associazione tra corso e docente
-    public static void insertInsegna(int idDocente, String Materia) throws SQLException {
+    public static int insertInsegna(String nome,String cognome, String Materia) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
+        int idDocente = getIdDocente(nome,cognome);
+        int idMateria = getIdMateria(Materia);
+        int righe = 0;
         Statement st = connection.createStatement();
         int righe = st.executeUpdate("INSERT INTO Insegna(idDocente,Materia) VALUES('" + idDocente + "','" + Materia + "')");
         if (righe > 0) {
@@ -57,46 +61,106 @@ public class DAO {
         connection.close();
     }
 
-    //metodo per l'eventuale registrazione dell'utente
-    //Di default alla colonna "ruolo" è assegnato il valore "cliente". Gli amministratori vengono dichiarati direttamente nel database.
-    public static void insertUtente(String account, String pwd) throws SQLException {
+    //metodo per la prenotazione da parte di un utente, utilizzato anche per  mostrare la cronologia in seguito.
+    public static void insertPrenotazione(String Nome, String Cognome, String Materia, String Account, String Data, String Ora) throws SQLException, ParseException {
+        int idDocente = getIdDocente(Nome,Cognome);
+        int idMateria = getIdMateria(Materia);
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
-        st.executeUpdate("INSERT INTO UTENTE(ACCOUNT,PASSWORD) VALUES('" + account + "','" + pwd + "')");
-        System.out.println("Aggiunta la riga " + account + pwd);
+
+
+            //inizio inserimento prenotazione
+            int righe = st.executeUpdate("INSERT INTO Prenotazione(Nome,Cognome,Materia,Account,Data,Ora) " +
+                    "SELECT * " +
+                    //controllo che la riga che stiamo cercando di inserire esista dentro la tabella delle ripetizioni
+                    "FROM(SELECT '" + Nome + "' AS Nome, '" + Cognome + "' as Cognome, '" + Materia + "' AS Materia,'" + Account + "' AS Account, '" + Data + "' AS Data, '" + Ora + "' AS Ora) AS query " +
+                    "WHERE EXISTS(SELECT idDocente,iDMateria,Data,Ora " +
+                    "FROM ripetizioni " +
+                    //controlli vari  tra cui anche che la ripetizione sia disponibile
+                    "WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria='" + idMateria + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "' AND UPPER(ripetizioni.disponibilita)='si')" +
+                    //controllo che la riga non esista già dentro la tabella
+                    "AND NOT EXISTS(SELECT Nome, Cognome, Materia, Data, Ora FROM Prenotazione " +
+                    "WHERE Prenotazione.Nome='" + Nome + "' AND Prenotazione.Cognome='"+ Cognome + "' AND Prenotazione.Materia = '" + Materia + "' AND Prenotazione.Data='" + Data + "' AND Prenotazione.Ora='" + Ora + "')" +
+                    //controllo che la ripetizione sia tra lunedi e venerdi, e che sia tra le 15 e le 18
+                    "AND WEEKDAY('" + Data + "')<5 AND HOUR('" + Ora + "')>=15 AND HOUR('" + Ora + "')<=18");
+
+            if (righe > 0) {
+                System.out.println("Prenotazione in data " + Data + " effettuata con successo.");
+                st.executeUpdate("UPDATE ripetizioni SET disponibilita='no' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria='" + idMateria + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
+            } else {
+                System.out.println("La prenotazione non è andata a buon fine, è possibile che dei dati siano sbagliati o che la ripetizione sia già stata prenotata.");
+            }
+
         st.close();
         connection.close();
     }
 
-    //metodo per la prenotazione da parte di un utente, utilizzato anche per  mostrare la cronologia in seguito.
-    public static void insertPrenotazione(int idDocente, String Materia, String Account, String Data, String Ora) throws SQLException {
-        Connection connection = DriverManager.getConnection(url, user, password);
-        Statement st = connection.createStatement();
-        //inizio inserimento prenotazione
-        int righe = st.executeUpdate("INSERT INTO Prenotazione(idDocente,Materia,Account,Data,Ora) " +
-                "SELECT * " +
-                //controllo che la riga che stiamo cercando di inserire esista dentro la tabella delle ripetizioni
-                "FROM(SELECT " + idDocente + " AS idDocente,'" + Materia + "' AS Materia,'" + Account + "' AS Account, '" + Data + "' AS Data, '" + Ora + "' AS Ora) AS query " +
-                "WHERE EXISTS(SELECT idDocente,Materia,Data,Ora " +
-                "FROM ripetizioni " +
-                //controlli vari  tra cui anche che la ripetizione sia disponibile
-                "WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.Materia='" + Materia + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "' AND ripetizioni.disponibilita='si')" +
-                //controllo che la riga non esista già dentro la tabella
-                "AND NOT EXISTS(SELECT idDocente, Materia, Data, Ora FROM Prenotazione " +
-                "WHERE Prenotazione.idDocente=" + idDocente + " AND Prenotazione.Data='" + Data + "' AND Prenotazione.Ora='" + Ora + "')" +
-                //controllo che la ripetizione sia tra lunedi e venerdi, e che sia tra le 15 e le 18
-                "AND WEEKDAY('" + Data + "')<5 AND HOUR('" + Ora + "')>=15 AND HOUR('" + Ora + "')<=18");
+    public static int getIdDocente(String Nome, String Cognome) throws SQLException  {
+        Connection conn = null;
+        int id = 0;
 
-        if (righe > 0) {
-            System.out.println("Prenotazione in data " + Data + " effettuata con successo.");
-            st.executeUpdate("UPTADE ripetizioni SET disponibilita='no' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.Materia='" + Materia + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
-        } else {
-            System.out.println("La prenotazione non è andata a buon fine, è possibile che dei dati siano sbagliati o che la ripetizione sia già stata prenotata.");
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+
+            Statement st = conn.createStatement();
+
+            ResultSet rs = st.executeQuery("SELECT id FROM docente WHERE docente.nome='"+Nome+"' AND docente.cognome = '"+Cognome+"';");
+
+            while(rs.next()){
+                id = rs.getInt("id");
+            }
+
+            rs.close();
+            st.close();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
         }
 
+        return id;
 
-        st.close();
-        connection.close();
+    }
+
+    public static int getIdMateria(String Materia) throws SQLException  {
+        Connection conn = null;
+        int id = 0;
+
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+
+            Statement st = conn.createStatement();
+
+            ResultSet rs = st.executeQuery("SELECT id FROM corso WHERE corso.Materia='"+Materia+"'");
+
+            while(rs.next()){
+                id = rs.getInt("id");
+            }
+
+            rs.close();
+            st.close();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e2) {
+                    System.out.println(e2.getMessage());
+                }
+            }
+        }
+
+        return id;
+
     }
 
     //inizio metodi delete
@@ -121,7 +185,7 @@ public class DAO {
     public static void deleteDocente(int idDocente) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
-        int righe = st.executeUpdate("DELETE FROM Docente WHERE idDocente=" + idDocente + ";");
+        int righe = st.executeUpdate("DELETE FROM docente WHERE id = " + idDocente + " ;");
         if (righe > 0) {
             System.out.println("Cancellata la riga " + idDocente);
         } else {
@@ -132,7 +196,9 @@ public class DAO {
     }
 
     //metodo per l'eliminazione dell'associazione corso docente
-    public static void deleteInsegna(int idDocente, String Materia) throws SQLException {
+    public static void deleteInsegna(String nome, String cognome, String Materia) throws SQLException {
+        int idDocente = getIdDocente(nome, cognome);
+        int idMateria = getIdMateria(Materia);
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
         st.executeUpdate("DELETE FROM Insegna WHERE idDocente=" + idDocente + " AND Materia='" + Materia + "'");
@@ -142,14 +208,33 @@ public class DAO {
     }
 
     //l'eliminazione di una prenotazione
-    public static void deletePrenotazione(String idDocente, String Materia, String account, Date Data, Time Ora) throws SQLException {
+    public static int deletePrenotazione(String Nome, String Cognome, String Materia, String account, String Data, String Ora) throws SQLException {
+        int idDocente = getIdDocente(Nome,Cognome);
+        int idMateria = getIdMateria(Materia);
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
-        st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'disdetta'  WHERE idDocente=" + idDocente + " AND Materia='" + Materia + "' AND Account='" + account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
-        st.executeUpdate("UPDATE ripetizioni SET disponibilita='si' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.Materia='" + Materia + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
-        System.out.println("Cancellata la riga " + idDocente + "," + Materia + "," + account);
+        int valido = 0;
+        ResultSet rs = st.executeQuery("SELECT CURRENT_DATE < '"+Data+"' AS valido");
+        while(rs.next()){
+            valido = rs.getInt("valido");
+        }
+        if(valido == 1){
+            int righe = st.executeUpdate("UPDATE Prenotazione SET  stato = 'disdetta'  WHERE Nome='" + Nome + "' AND Cognome='"+ Cognome +"' AND Materia='" + Materia + "' AND Account='" + account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
+            if(righe>0){
+                st.executeUpdate("UPDATE ripetizioni SET disponibilita='si' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria=" + idMateria + "  AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
+            }
+            else{
+                System.out.println("Prenotazione non esiste");
+            }
+        }else{
+            System.out.println("La ripetizione che si intende disdire è già stata effettuata dal professore.");
+        }
+
+
+
         st.close();
         connection.close();
+        return valido;
     }
 
     //metodo per il login, controlla che esista l'account e restituisce il ruolo
@@ -169,48 +254,23 @@ public class DAO {
 
     }
 
-    public static void PrenotazioneEffettuata(ArrayList<Prenotazione> id, ArrayList<Prenotazione> Materia, ArrayList<Prenotazione> Account, ArrayList<Prenotazione> Data, ArrayList<Prenotazione> Ora) throws SQLException {
+    public static int prenotazioneEffettuata(String nome, String cognome, String materia, String account, String data, String ora) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         Statement st = connection.createStatement();
+        int valido = 0;
+        ResultSet rs = st.executeQuery("SELECT CURRENT_DATE > '"+data+"' AS valido");
+        while(rs.next()){
+            valido = rs.getInt("valido");
+        }
+        if(valido == 1){
+            st.executeUpdate("UPDATE Prenotazione SET  stato = 'effettuata'  WHERE Nome='" + nome + "' AND Cognome='" +
+                    cognome + "' AND Materia='"+ materia +"' AND Account='" + account + "' AND Data='" +
+                    data + "' AND Ora='" + ora + "'");
+        }
 
-        st.executeUpdate("UPDATE Prenotazione SET  'stato' = 'effettuata'  WHERE idDocente=" + id + " AND Materia='" + Materia + "' AND Account='" + Account + "' AND Data='" + Data + "' AND Ora='" + Ora + "'");
         st.close();
         connection.close();
     }
-   /* public static String queryDB() throws SQLException {
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
-        ResultSet rs;
-        String out = "";
-        out = out + "Tabella Docente: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Docente");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Nome = " + rs.getString("NOME") + "\n";
-
-        }
-        out = out + "Tabella Corso: " + "\n";
-        rs = st.executeQuery("SELECT * FROM CORSO");
-        while (rs.next()) {
-            out = out + "nomeCorso= " + rs.getString("Materia") + "\n";
-        }
-        out = out + "Tabella Insegna: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Insegna");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + "\n";
-        }
-        out = out + "Tabella Prenotazione: " + "\n";
-        rs = st.executeQuery("SELECT * FROM Prenotazione");
-        while (rs.next()) {
-            out = out + "idDocente= " + rs.getInt("idDocente") + ", Materia = " + rs.getString("Materia") + ", account = " + rs.getString("account") + ", Data = " + rs.getString("Data") + ", Ora = " + rs.getString("Ora") + "\n";
-        }
-        out = out + "Fine";
-        rs.close();
-        st.close();
-        conn.close();
-        return out;
-    }
-    */
-
 
     public static ArrayList<Docente> showDocente() throws SQLException {
         Connection conn = null;
@@ -289,8 +349,7 @@ public class DAO {
     public static ArrayList<Insegna> showInsegna() throws SQLException {
         Connection conn = null;
         ArrayList<Insegna> out = new ArrayList<>();
-        ResultSet rs;
-        Insegna ins;
+        Insegna insegna;
 
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -300,13 +359,13 @@ public class DAO {
 
             Statement st = conn.createStatement();
 
-            /*rs = st.executeQuery("SELECT Nome,Cognome,Materia" +
-                                     "FROM Insegna,Docente" +"WHERE Docente.idDocente = Insegna.idDocente;");*/
-            rs = st.executeQuery("SELECT * FROM Insegna");
+            ResultSet rs = st.executeQuery("SELECT insegna.id, docente.Nome, docente.Cognome, corso.Materia " +
+                                    "FROM docente, insegna, corso " +
+                                    "WHERE docente.id = insegna.idDocente AND corso.id=insegna.idMateria ; ");
 
             while (rs.next()) {
-                ins = new Insegna(rs.getInt("idDocente"), rs.getString("Materia"));
-                out.add(ins);
+                insegna = new Insegna(rs.getInt("id"), rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"));
+                out.add(insegna);
             }
             rs.close();
             st.close();
@@ -346,7 +405,7 @@ public class DAO {
                     "AND (ripetizioni.disponibilita='si' OR  ripetizioni.disponibilita='Si' OR ripetizioni.disponibilita='SI'); ");
 
             while (rs.next()) {
-                rip = new Ripetizioni(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"));
+                rip = new Ripetizioni(rs.getInt("id"), rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getString("Data"), rs.getString("Ora"));
                 out.add(rip);
             }
             rs.close();
@@ -384,7 +443,7 @@ public class DAO {
                     "FROM prenotazione, docente " +
                     "WHERE prenotazione.account ='" + account + "' AND docente.idDocente = prenotazione.idDocente; ");
             while (rs.next()) {
-                pre = new Prenotazione(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"), rs.getString("Stato"));
+                pre = new Prenotazione(rs.getInt("id"), rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getString("Data"), rs.getString("Ora"), rs.getString("Stato"));
                 out.add(pre);
             }
 
@@ -407,10 +466,10 @@ public class DAO {
 
     }
 
-    public static ArrayList<Prenotazione> showPrenotazioneAmministratore() throws SQLException {
+    public static ArrayList<PrenotazioneAmministratore> showPrenotazioneAmministratore() throws SQLException {
         Connection conn = null;
-        ArrayList<Prenotazione> out = new ArrayList<>();
-        Prenotazione pre;
+        ArrayList<PrenotazioneAmministratore> out = new ArrayList<>();
+        PrenotazioneAmministratore pre;
 
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -420,11 +479,11 @@ public class DAO {
 
             Statement st = conn.createStatement();
 
-            ResultSet rs = st.executeQuery("SELECT Nome, Cognome, Materia, Data, Ora, stato " +
-                    "FROM prenotazione, docente " +
-                    "WHERE docente.idDocente = prenotazione.idDocente; ");
+            ResultSet rs = st.executeQuery("SELECT id, Nome, Cognome, Materia, Data, Ora, Stato, Account " +
+                    "FROM prenotazione ");
+
             while (rs.next()) {
-                pre = new Prenotazione(rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getDate("Data"), rs.getTime("Ora"), rs.getString("Stato"));
+                pre = new PrenotazioneAmministratore(rs.getInt("id"), rs.getString("Nome"), rs.getString("Cognome"), rs.getString("Materia"), rs.getString("Data"), rs.getString("Ora"), rs.getString("Stato"), rs.getString("account"));
                 out.add(pre);
             }
 

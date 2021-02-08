@@ -1,79 +1,85 @@
 let ClienteContainer = {
     data: function () {
         return {
-            showTabella: false,
-            azione: "",
-            tabella: [],
-            headers: [],
+            showTabella: false, //non stampiamo la tabella vuota, quindi va a true solo se la fetch da risultato positivo
+            singleSelect: true, //per poter selezionare solo un oggetto alla volta
+            azione: "", // parametro che daremo alla fetch per i controlli della servlet
+            headers: [], //header della tabella
+            tabella: [], // item interni alla tabella
+            selected: [], // oggetto selezionato dall'utente
+            op: "", // operazione da passare al componente operazioni
             updater: 0,
-            singleSelect: true,
-            selected: []
         }
     },
+    components: { OperazioniContainer },
     template: `
         <v-main>
             <v-container>
                 <div>
-                    <v-btn
-                        color="secondary"
-                        depressed
+                     <v-btn                   
+                        color="blue"
                         elevation="2"
-                        outlined
-                        plain
+                        
                         raised
-                        v-on:click="showRipetizioni"> showRipetizioni
+                        v-on:click="showRipetizioni"> Ripetizioni
                     </v-btn>
                     <v-btn
-                        color="secondary"
-                        depressed
+                        color="blue"
                         elevation="2"
-                        outlined
-                        plain
+                        
                         raised
-                        v-on:click="showPrenotazione"> showPrenotazione
+                        v-on:click="showPrenotazione"> Cronologia Prenotazioni
                     </v-btn>
                 </div>
-                <div v-if="showTabella">
+                <div  v-if="showTabella" style="margin-top:10%">
                     <v-data-table
                         v-model="selected"
                         :headers="headers"
                         :items="tabella"
                         :single-select="singleSelect"
                         :items-per-page="5"
-                        class="elevation-1"
-                        item-key="nome"
+                        item-key="id"
+                        :sort-by="['id']"
                         show-select
-                      ></v-data-table>
-                </div>
-                <div id="show">{{selected}}</div>
+                        class="elevation-2"
+                      ></v-data-table>                 
+                </div>                
+                <operazioni-container :selected="selected" :operazione="op"></operazioni-container>
                 </v-container>
         </v-main>
     `,
     methods: {
+        //tutti i metodi imposteranno l'azione da eseguire dalla servlet e poi richiameranno il metodo generico per costruire la tabella
         async showRipetizioni() {
             this.azione = "showRipetizioni";
             await this.getHeaders();
+            this.op = "ripetizioni";
         },
 
         async showPrenotazione() {
             this.azione = "showPrenotazione";
             await this.getHeaders();
-            //this.$session.getAll();
+            this.op = "prenotazione";
         },
 
+        //metodo per la costruzione della tabella, con headers e oggetti generati dinamicamente
         async getHeaders() {
-            let result = await fetch(`ModificaServlet?azione=${this.azione}`);
+            let result = await fetch(`ModificaServlet?azione=${this.azione}&utente=${myStorage.getItem('utente')}`);
             this.tabella = await result.json();
-
+            this.showTabella = true;
             if (this.tabella.length > 0) {
                 this.headers = [];
                 for (let key in this.tabella[0]) {
                     this.headers.push({text: this.primaLetteraMaiuscola(key), value: key});
                 }
+                this.headers[0] = { //rimpiazziamo id con # per bellezza
+                    text: "#",
+                    value: "id"
+                };
             }
-            this.showTabella = true;
         },
 
+        //rende la prima lettera di una stringa maiuscola.
         primaLetteraMaiuscola(str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
         }

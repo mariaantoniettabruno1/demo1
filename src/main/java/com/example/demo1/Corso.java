@@ -2,9 +2,11 @@ package com.example.demo1;
 
 public class Corso {
 
+    private int id;
     private String Materia;
 
-    public Corso(String materia) {
+    public Corso(int id, String materia) {
+        this.id = id;
         this.Materia = materia;
     }
 

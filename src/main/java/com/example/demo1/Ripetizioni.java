@@ -4,14 +4,16 @@ import java.sql.Time;
 import java.util.Date;
 
 public class Ripetizioni {
+    private int id;
     private String nome;
     private String cognome;
     private String materia;
-    private Date data;
-    private Time ora;
+    private String data;
+    private String ora;
 
 
-    public Ripetizioni(String nome, String cognome, String materia, java.sql.Date data, Time ora) {
+    public Ripetizioni(int id, String nome, String cognome, String materia, String data, String ora) {
+        this.id = id;
         this.nome = nome;
         this.cognome = cognome;
         this.materia = materia;
@@ -19,6 +21,9 @@ public class Ripetizioni {
         this.ora = ora;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getNome() {
         return nome;
     }
@@ -31,11 +36,11 @@ public class Ripetizioni {
         return materia;
     }
 
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public Time getOra() {
+    public String getOra() {
         return ora;
     }
 
@@ -43,6 +48,7 @@ public class Ripetizioni {
     @Override
     public String toString() {
         return "{ " +
+                "\"#\": " + "\"" + this.getId() + "\", " +
                 "\"Nome\": " + "\"" + this.getNome() + "\", " +
                 "\"Cognome\": " + "\"" + this.getCognome() + "\", " +
                 "\"Materia\": " + "\"" + this.getMateria() + "\", " +
