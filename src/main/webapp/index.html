@@ -28,9 +28,7 @@
 
 </body>
 <!-- import dei componenti dalla directory /components -->
-<script src="components/inputform.js"></script>
 <script src="components/operazioni.js"></script>
-<script src="components/home.js"></script>
 <script src="components/login.js"></script>
 <script src="components/cliente.js"></script>
 <script src="components/amministratore.js"></script>
@@ -40,14 +38,12 @@
 
     //dichiarazione delle routes per i path dei component
     const routes = [
-        {path: "/inputform", component: InputformContainer, meta: {requiresAuth: true, requiresRuolo: "amministratore"}},
         {path: "/operazioni", component: OperazioniContainer, meta: {requiresAuth: true}},
-        {path: "/", component: HomeContainer},
         {path: "/login", component: LoginContainer},
         {path: "/cliente", component: ClienteContainer, meta: {requiresAuth: true, requiresRuolo: "cliente"}},
         {path: "/amministratore", component: AmministratoreContainer, meta: {requiresAuth: true, requiresRuolo: "amministratore"}},
 
-        {path: "**", redirect : "/"},
+        {path: "**", redirect : "/login"},
     ];
     //dichiarazione dei router per "muoversi" tra i componenti
     let router = new VueRouter({

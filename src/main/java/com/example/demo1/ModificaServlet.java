@@ -74,8 +74,8 @@ public class ModificaServlet extends HttpServlet {
                 String data =request.getParameter("data");
                 String ora =request.getParameter("ora");
                 //System.out.println(nome + " " + cognome + " " +  materia + " " + account + " " + data + " " + ora);
-
-                DAO.insertPrenotazione(nome,cognome,materia,account,data,ora);
+                int valido = DAO.insertPrenotazione(nome,cognome,materia,account,data,ora);
+                out.println(valido);
 
             } else if (azione.equals("deletePrenotazione")) {
                 String nome = request.getParameter("nome");
