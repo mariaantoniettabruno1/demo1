@@ -80,7 +80,7 @@ public class DAO {
                     "WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria=" + idMateria + " AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "' AND UPPER(ripetizioni.disponibilita)='si')" +
                     //controllo che la riga non esista già dentro la tabella
                     "AND NOT EXISTS(SELECT Nome, Cognome, Materia, Data, Ora FROM Prenotazione " +
-                    "WHERE Prenotazione.Nome='" + Nome + "' AND Prenotazione.Cognome='"+ Cognome + "' AND Prenotazione.Materia = '" + Materia + "' AND Prenotazione.Data='" + Data + "' AND Prenotazione.Ora='" + Ora + "')" +
+                    "WHERE Prenotazione.Nome='" + Nome + "' AND Prenotazione.Cognome='"+ Cognome + "' AND Prenotazione.Materia = '" + Materia + "' AND Prenotazione.Data='" + Data + "' AND Prenotazione.Ora='" + Ora + "' AND stato = 'attiva')" +
                     //controllo che la ripetizione sia tra lunedi e venerdi, e che sia tra le 15 e le 18
                     "AND WEEKDAY('" + Data + "')<5 AND HOUR('" + Ora + "')>=15 AND HOUR('" + Ora + "')<=18");
 

@@ -164,10 +164,12 @@ let OperazioniContainer = {
         async inserisciPrenotazione() {
 
                 this.azione = "inserisciPrenotazione";
-
+                var self = this;
                 let url = "ModificaServlet?azione="+this.azione+"&nome="+this.selected[0].nome+"&cognome="+this.selected[0].cognome+"&materia="+this.selected[0].materia+
                     "&account="+myStorage.getItem('utente')+"&data="+this.selected[0].data+"&ora="+this.selected[0].ora;
-                await fetch(url);
+                await fetch(url)
+                    .then(response => response.json())
+                    .then(data => this.result = data);
                 if(this.result == 0){
                     alert("Non è stato possibile prenotare la ripetizione.");
                 }
@@ -183,7 +185,9 @@ let OperazioniContainer = {
                 this.azione = "deletePrenotazione";
                 let url = "ModificaServlet?azione="+this.azione+"&nome="+this.selected[0].nome+"&cognome="+this.selected[0].cognome+"&materia="+this.selected[0].materia+
                     "&account="+myStorage.getItem('utente')+"&data="+this.selected[0].data+"&ora="+this.selected[0].ora;
-                await fetch(url);
+                await fetch(url)
+                    .then(response => response.json())
+                    .then(data => this.result = data);
                 if(this.result == 0){
                     alert("La prenotazione non può essere segnata come disdetta dopo la data della stessa.");
                 }
