@@ -1,364 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="libs/vue.min.js"></script> <!-- import libreria Vue.js v2.6.12 -->
+    <script src="libs/vue-router.js"></script> <!-- import libreria vue-router v3.4.9 -->
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <!-- import della libreria Vuetify 2.4.3 per la grafica -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- import script ajax e jquery -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <!-- import del font family Roboto -->
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <!-- import icone e css di google (material design) -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <!-- import del css di Vuetify 2.4.3 -->
+    <link rel="icon" href="icons/books.png">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" name="viewport">
     <meta charset="UTF-8">
-    <title>Unito</title>
-    <!-- import Vue, Ajax, BootsTrap, javascript e css -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"><!-- BootsTrap -->
-    <link href="Style.css" rel="stylesheet"> <!-- Nostro css -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> <!-- Vue -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- Ajax -->
+    <title>UNITO</title>
+
 </head>
 <body>
 <div id="app">
-
-    <loginform ref="templateApp"></loginform>
-    <bottoni ref="templateBottoni"></bottoni>
-    <div id="loggato" class="container align-middle col-8 hide" ></div>
-
+    <v-app>
+        <router-view></router-view>
+    </v-app>
 </div>
 
-<script>
-
-    // script Vue.js
-
-    //componente e template per l'html del form di login, compreso di logica dei bottoni e richiamo della servlet.
-    var loginFormJS = Vue.component('loginform', {
-
-        template: `
-          <div v-show="isActive" class="w-25 p-3 position-absolute top-50 start-50 translate-middle">
-
-          <form v-on:submit.prevent="login">
-            <div class="form-group">
-              <label for="username">Username</label>
-              <input type="text" class="form-control" aria-describedby="emailHelp" id="username" required
-                     autocomplete="off">
-            </div>
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" class="form-control" id="password" required autocomplete="off">
-            </div>
-            <input type="submit" class="btn btn-primary" id="logga" value="login">
-          </form>
-          </div>
-        `,
-        data() {
-            return {
-                isActive: true
-            };
-        }
-        ,
-        methods: {
-            showForm() {
-                this.isActive = !this.isActive;
-            },
-
-            login() {
-                var utente = document.getElementById("username").value;
-                var password = document.getElementById("password").value;
-
-                //se il form è compilato mandiamo una richiesta alla servlet che contatta il DAO per vedere se l'account ricevuto in input è valido
-                azione = "checkACC";
-
-                var ruolo = "";
-                var self = this;
-                $.post("ModificaServlet", {
-                    utente: utente,
-                    password: password,
-                    azione: azione
-                }, function (ServletOutput) {
-
-                    self.ruolo = ServletOutput;
-
-                    if (self.ruolo.trim() === "cliente" || self.ruolo.trim() === "amministratore") {
-                        self.showForm();
-                        vm.$refs.templateBottoni.passaRuolo(self.ruolo.trim());
-                    } else {
-                        alert("Utente non registrato");
-                    }
-
-                });
-            }
-
-        }
-    });
-
-    //componente e template per l'html dei bottoni che appaiono una volta loggato, compresi di logica e richiami della servlet.
-    var bottoniJS = Vue.component('bottoni', {
-        template: `
-          <div v-if="ruolo.trim() === 'cliente'">
-          <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Utente</p>
-          <button type='button' class='btn btn-primary position-absolute top-0 start-50 ' id='ripetizioni'
-                  v-on:click="showRipetizioni">Ripetizioni Disponibili
-          </button>
-          <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'
-                  v-on:click="showPrenotazione">Cronologia Prenotazioni
-          </button>
-          </div>
-
-          <div v-else-if="ruolo.trim() === 'amministratore'">
-          <p class='w-25 p-3 position-absolute top-0 start-0'>Sei loggato come Amministratore</p>
-          <button type='button' class='btn btn-primary position-absolute top-0 start-50 ' id='ripetizioni'
-                  v-on:click="showRipetizioni">Ripetizioni Disponibili
-          </button>
-          <button type='button' class='btn btn-primary position-absolute top-0 end-50 ' id='prenotazione'
-                  v-on:click="showPrenotazione">Cronologia Prenotazioni
-          </button>
-          </div>
-        `,
-        data() {
-            return {
-                ruolo: "",
-                stampa: "",
-            };
-        }
-        ,
-        methods: {
-            showForm() {
-                this.isActive = !this.isActive;
-            },
-
-            passaRuolo(s) {
-                this.ruolo = s;
-            },
-
-            showRipetizioni() {
-                var azione = "showRipetizioni";
-                var self = this;
-                var result = "";
-                var tabella = "";
-                var i = 1;
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (ServletOutput) {
-
-                        result= $.parseJSON(ServletOutput);
-
-                        console.log(ServletOutput);
-
-                        tabella='<table class="table">\
-                                   <thead>\
-                                        <tr>\
-                                            <th scope="col">#</th>\
-                                            <th scope="col">Nome</th>\
-                                            <th scope="col">Cognome</th>\
-                                            <th scope="col">Materia</th>\
-                                            <th scope="col">Data</th>\
-                                            <th scope="col">Ora</th>\
-                                            <th scope="col">Disponibile</th>\
-                                        </tr>\
-                                   </thead>\
-                                   <tbody>';
-
-
-                        $.each( result, function( key, value ) {
-                            tabella += "  <tr>\
-                                        <th scope='row'>"+i+"</th>\
-                                            <td>"+value['nome']+"</td>\
-                                            <td>"+value['cognome']+"</td>\
-                                            <td>"+value['materia']+"</td>\
-                                            <td>"+value['data']+"</td>\
-                                            <td>"+value['ora']+"</td>\
-                                            <td>"+value['disponibilita']+"</td>\
-                                        </tr>";
-                            i++;
-                        });
-
-                        tabella += '</tbody>\n' +
-                            '</table>';
-                        $("#loggato").css({"visibility": "visible"});
-                        $("#loggato").html(tabella);
-                    }
-                );
-
-            },
-            showDocente(){
-                var azione = "showDocente";
-                var self = this;
-                var result = "";
-                var tabella = "";
-                var i = 1;
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (ServletOutput) {
-
-                        result = $.parseJSON(ServletOutput);
-
-                        console.log(ServletOutput);
-
-                        tabella = '<table class="table">\
-                                   <thead>\
-                                        <tr>\
-                                           \<th scope="col">idDocente</th>\
-                                            <th scope="col">Nome</th>\
-                                            <th scope="col">Cognome</th>\
-                                        </tr>\
-                                   </thead>\
-                                   <tbody>';
-
-
-                        $.each(result, function (key, value) {
-                            tabella += "  <tr>\
-                                            <td>" + value['id'] + "</td>\
-                                            <td>" + value['nome'] + "</td>\
-                                            <td>" + value['cognome'] + "</td>\
-                                        </tr>";
-                            i++;
-                        });
-
-                        tabella += '</tbody>\n' +
-                            '</table>';
-                        $("#loggato").css({"visibility": "visible"});
-                        $("#loggato").html(tabella);
-                    }
-                )
-            },
-            showInsegna(){
-                var azione = "showInsegna";
-                var self = this;
-                var result = "";
-                var tabella = "";
-                var i = 1;
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (ServletOutput) {
-
-                        result = $.parseJSON(ServletOutput);
-
-                        console.log(ServletOutput);
-
-                        tabella = '<table class="table">\
-                                   <thead>\
-                                        <tr>\
-                                           \<th scope="col">idDocente</th>\
-                                            \<th scope="col">Corso</th>\
-                                        </tr>\
-                                   </thead>\
-                                   <tbody>';
-
-
-                        $.each(result, function (key, value) {
-                            tabella += "  <tr>\
-                                            \<td>" + value['idDocente'] + "</td>\
-                                            \<td>" + value['materia'] + "</td>\
-                                        </tr>";
-                            i++;
-                        });
-
-                        tabella += '</tbody>\n' +
-                            '</table>';
-                        $("#loggato").css({"visibility": "visible"});
-                        $("#loggato").html(tabella);
-                    }
-                )
-            },
-            showCorso(){
-                var azione = "showCorso";
-                var self = this;
-                var result = "";
-                var tabella = "";
-                var i = 1;
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (ServletOutput) {
-
-                        result = $.parseJSON(ServletOutput);
-                        console.log(ServletOutput);
-
-                        tabella = '<table class="table">\
-                                   <thead>\
-                                        <tr>\
-                                           \<th scope="col">Materia</th>\
-                                        </tr>\
-                                   </thead>\
-                                   <tbody>';
-
-
-                        $.each(result, function (key, value) {
-                            tabella += "  <tr>\
-                                            <td>" + value['Materia'] + "</td>\
-                                        </tr>";
-                            i++;
-                        });
-
-                        tabella += '</tbody>\n' +
-                            '</table>';
-                        $("#loggato").css({"visibility": "visible"});
-                        $("#loggato").html(tabella);
-                    }
-                )
-            },
-            showPrenotazione() {
-                var azione = "showPrenotazione";
-                var self = this;
-                var result = "";
-                var tabella = "";
-                var i = 1;
-
-                $.post("ModificaServlet", {azione: azione},
-                    function (ServletOutput) {
-
-                        result= $.parseJSON(ServletOutput);
-
-                        console.log(ServletOutput);
-
-                        tabella='<table class="table">\
-                                   <thead>\
-                                        <tr>\
-                                            <th scope="col">#</th>\
-                                            <th scope="col">Nome</th>\
-                                            <th scope="col">Cognome</th>\
-                                            <th scope="col">Materia</th>\
-                                            <th scope="col">Data</th>\
-                                            <th scope="col">Ora</th>\
-                                            <th scope="col">Stato</th>\
-                                        </tr>\
-                                   </thead>\
-                                   <tbody>';
-
-
-                        $.each( result, function( key, value ) {
-                            tabella += "  <tr>\
-                                        <th scope='row'>" + i + "</th>\
-                                            <td>" + value['nome'] + "</td>\
-                                            <td>" + value['cognome'] + "</td>\
-                                            <td>" + value['materia'] + "</td>\
-                                            <td>" + value['data'] + "</td>\
-                                            <td>" + value['ora'] + "</td>\
-                                            <td>" + value['stato'] + "</td>\
-                                        </tr>";
-                            i++;
-                        });
-
-                        tabella += '</tbody>\n' +
-                            '</table>';
-                        $("#loggato").css({"visibility": "visible"});
-                        $("#loggato").html(tabella);
-                    }
-                );
-
-            }
-        }
-    });
-
-    // inizializzazione del vue model
-    var vm = new Vue({
-
-        el: '#app',
-        data: {}
-    });
-
-
-    // script Ajax
-    function isEmpty(el) {
-        return !$.trim(el.html())
-    }
-
-
-    $( "#prenota" ).click(function() {
-        alert( "test" );
-    });
-</script>
-
 </body>
+<!-- import dei componenti dalla directory /components -->
+<script src="components/operazioni.js"></script>
+<script src="components/login.js"></script>
+<script src="components/cliente.js"></script>
+<script src="components/amministratore.js"></script>
+<script>
+    //sessionstorage per controllare i permessi
+    let myStorage = window.localStorage;
+
+    //dichiarazione delle routes per i path dei component
+    const routes = [
+        {path: "/operazioni", component: OperazioniContainer, meta: {requiresAuth: true}},
+        {path: "/login", component: LoginContainer},
+        {path: "/cliente", component: ClienteContainer, meta: {requiresAuth: true, requiresRuolo: "cliente"}},
+        {path: "/amministratore", component: AmministratoreContainer, meta: {requiresAuth: true, requiresRuolo: "amministratore"}},
+
+        {path: "**", redirect : "/login"},
+    ];
+    //dichiarazione dei router per "muoversi" tra i componenti
+    let router = new VueRouter({
+        routes: routes
+    });
+
+    //controllo dei permessi
+    router.beforeEach((to, from, next) => {
+        const getRuolo = myStorage.getItem('ruolo');
+        const requiresCliente = to.meta.requiresRuolo == 'cliente';
+        const requiresAmministratore = to.meta.requiresRuolo == 'amministratore';
+            //se il prossimo componente richiede autorizzazioni, entra nell'if
+            if(to.matched.some(r => r.meta.requiresRuolo)){
+                //se non si è loggati, si fa il redirect alla pagina di login
+                if(getRuolo === null){
+                    return next({ path: '/login', query: { returnUrl: to.path } });
+                }
+                //altrimenti, se si è loggati si controlla se si dispone delle autizzazioni necessarie
+                else if(to.matched.some(s => s.meta.requiresRuolo)){
+                    if((getRuolo == 'cliente' && requiresCliente) || (getRuolo == 'amministratore' && requiresAmministratore)){
+                        return next();
+                    }
+                    // se si prova ad entrare in una pagina in cui non si hanno i permessi ( /amministratore con il ruolo di cliente )
+                    else{
+                        //redirect alla pagina del proprio ruolo
+                            return next({ path: "/"+getRuolo, query: { returnUrl: to.path } });
+                    }
+                }
+            }
+            else{
+                next();
+            }
+    });
+
+    //dichiarazione di vuetify
+    const vuetify = new Vuetify(
+        {
+        theme: {
+
+                dark: {
+                    primary: '#000000',
+                    secondary: '#b0bec5',
+                    accent: '#52BE80',
+                    error: '#b71c1c',
+
+                },
+
+        },
+    }
+    );
+
+    //dichiarazione di Vue.js
+    const vue = new Vue({
+        el: '#app',
+        vuetify,
+        router,
+    })
+
+</script>
 </html>

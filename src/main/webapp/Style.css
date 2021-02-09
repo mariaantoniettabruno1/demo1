@@ -2,6 +2,28 @@ body {
     color: #eee;
     background: #121212;
 }
+
 a {
     color: #809fff;
+}
+
+.lightmode {
+    color: #222;
+    background: floralwhite;
+}
+
+.hide {
+    visibility: hidden;
+    width: 50%;
+    height: 25%;
+    margin-top: 25%;
+    margin-bottom: 25%;
+    vertical-align: middle;
+    color: #222;
+    background: floralwhite;
+}
+
+.dark-mode {
+    color: #eee;
+    background: #121212;
 }

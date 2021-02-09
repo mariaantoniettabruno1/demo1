@@ -4,24 +4,26 @@ import java.sql.Time;
 import java.util.Date;
 
 public class Ripetizioni {
+    private int id;
     private String nome;
     private String cognome;
     private String materia;
-    private Date data;
-    private Time ora;
-    private String disponibilita;
+    private String data;
+    private String ora;
 
 
-
-    public Ripetizioni(String nome, String cognome, String materia, java.sql.Date data, Time ora, String disponibilita) {
+    public Ripetizioni(int id, String nome, String cognome, String materia, String data, String ora) {
+        this.id = id;
         this.nome = nome;
         this.cognome = cognome;
         this.materia = materia;
         this.data = data;
         this.ora = ora;
-        this.disponibilita = disponibilita;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getNome() {
         return nome;
     }
@@ -34,27 +36,24 @@ public class Ripetizioni {
         return materia;
     }
 
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public Time getOra() {
+    public String getOra() {
         return ora;
     }
 
-    public String getDisponibilita() {
-        return disponibilita;
-    }
 
     @Override
     public String toString() {
-        return  "{ " +
-                "\"Nome\": " + "\""+this.getNome()+"\", " +
-                "\"Cognome\": " + "\""+this.getCognome()+"\", " +
-                "\"Materia\": " + "\""+this.getMateria()+"\", " +
-                "\"Data\": " + "\""+this.getData()+"\", " +
-                "\"Ora\": " + "\""+this.getOra()+"\", " +
-                "\"Disponibilita\": " + "\""+this.getDisponibilita()+"\"" +
+        return "{ " +
+                "\"#\": " + "\"" + this.getId() + "\", " +
+                "\"Nome\": " + "\"" + this.getNome() + "\", " +
+                "\"Cognome\": " + "\"" + this.getCognome() + "\", " +
+                "\"Materia\": " + "\"" + this.getMateria() + "\", " +
+                "\"Data\": " + "\"" + this.getData() + "\", " +
+                "\"Ora\": " + "\"" + this.getOra() + "\", " +
                 " }";
     }
 }
