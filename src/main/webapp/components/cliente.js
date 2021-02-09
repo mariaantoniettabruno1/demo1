@@ -8,7 +8,6 @@ let ClienteContainer = {
             tabella: [], // item interni alla tabella
             selected: [], // oggetto selezionato dall'utente
             op: "", // operazione da passare al componente operazioni
-            updater: 0,
         }
     },
     components: { OperazioniContainer },
@@ -17,14 +16,14 @@ let ClienteContainer = {
             <v-container>
                 <div>
                      <v-btn                   
-                        color="blue"
+                        color="#737CA1"
                         elevation="2"
                         
                         raised
                         v-on:click="showRipetizioni"> Ripetizioni
                     </v-btn>
                     <v-btn
-                        color="blue"
+                        color="#737CA1"
                         elevation="2"
                         
                         raised
@@ -48,22 +47,26 @@ let ClienteContainer = {
                 </v-container>
         </v-main>
     `,
+    mounted() {
+        this.$root.$on('cambiata', async () => await this.getHeaders());
+    },
     methods: {
         //tutti i metodi imposteranno l'azione da eseguire dalla servlet e poi richiameranno il metodo generico per costruire la tabella
         async showRipetizioni() {
             this.azione = "showRipetizioni";
             await this.getHeaders();
-            this.op = "ripetizioni";
+            this.op = "showRipetizioni";
         },
 
         async showPrenotazione() {
             this.azione = "showPrenotazione";
             await this.getHeaders();
-            this.op = "prenotazione";
+            this.op = "showPrenotazione";
         },
 
         //metodo per la costruzione della tabella, con headers e oggetti generati dinamicamente
         async getHeaders() {
+            this.selected = "";
             let result = await fetch(`ModificaServlet?azione=${this.azione}&utente=${myStorage.getItem('utente')}`);
             this.tabella = await result.json();
             this.showTabella = true;

@@ -62,7 +62,7 @@ public class DAO {
     }
 
     //metodo per la prenotazione da parte di un utente, utilizzato anche per  mostrare la cronologia in seguito.
-    public static void insertPrenotazione(String Nome, String Cognome, String Materia, String Account, String Data, String Ora) throws SQLException, ParseException {
+    public static int insertPrenotazione(String Nome, String Cognome, String Materia, String Account, String Data, String Ora) throws SQLException, ParseException {
         int idDocente = getIdDocente(Nome,Cognome);
         int idMateria = getIdMateria(Materia);
         Connection connection = DriverManager.getConnection(url, user, password);
@@ -77,7 +77,7 @@ public class DAO {
                     "WHERE EXISTS(SELECT idDocente,iDMateria,Data,Ora " +
                     "FROM ripetizioni " +
                     //controlli vari  tra cui anche che la ripetizione sia disponibile
-                    "WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria='" + idMateria + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "' AND UPPER(ripetizioni.disponibilita)='si')" +
+                    "WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria=" + idMateria + " AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "' AND UPPER(ripetizioni.disponibilita)='si')" +
                     //controllo che la riga non esista già dentro la tabella
                     "AND NOT EXISTS(SELECT Nome, Cognome, Materia, Data, Ora FROM Prenotazione " +
                     "WHERE Prenotazione.Nome='" + Nome + "' AND Prenotazione.Cognome='"+ Cognome + "' AND Prenotazione.Materia = '" + Materia + "' AND Prenotazione.Data='" + Data + "' AND Prenotazione.Ora='" + Ora + "')" +
@@ -86,13 +86,14 @@ public class DAO {
 
             if (righe > 0) {
                 System.out.println("Prenotazione in data " + Data + " effettuata con successo.");
-                st.executeUpdate("UPDATE ripetizioni SET disponibilita='no' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria='" + idMateria + " ' AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
+                st.executeUpdate("UPDATE ripetizioni SET disponibilita='no' WHERE ripetizioni.idDocente=" + idDocente + " AND ripetizioni.idMateria=" + idMateria + " AND ripetizioni.Data='" + Data + "' AND ripetizioni.Ora='" + Ora + "'");
             } else {
                 System.out.println("La prenotazione non è andata a buon fine, è possibile che dei dati siano sbagliati o che la ripetizione sia già stata prenotata.");
             }
 
         st.close();
         connection.close();
+        return righe;
     }
 
     public static int getIdDocente(String Nome, String Cognome) throws SQLException  {

@@ -9,11 +9,10 @@ let OperazioniContainer = {
             result : null,
         }
     },
-    components: { InputformContainer },
     template: `
     <div style="margin-top:2%">
-    <div v-if="operazione === 'ripetizioni'" >  
-                                              <!--operazioni tabella prenotazioni-->
+    <div v-if="operazione === 'showRipetizioni'" >  <!--operazioni tabella prenotazioni disponibili-->
+                                              
                     <v-btn                 
                         color="#41A317"
                         elevation="2"
@@ -21,7 +20,7 @@ let OperazioniContainer = {
                         v-on:click="inserisciPrenotazione"> Prenota
                     </v-btn>
                     </div>                   
-     <div v-else-if="operazione === 'prenotazione'">         <!--operazioni tabella cronologiaRipetizioni-->
+     <div v-else-if="operazione === 'showPrenotazione'">         <!--operazioni tabella cronologiaRipetizioni-->
                     <v-btn             
                         color="#E42217"
                         elevation="2" 
@@ -36,9 +35,15 @@ let OperazioniContainer = {
                     </v-btn>
                     
      </div>
-     <div v-else-if="operazione === 'docente'">           <!--operazoni tabella docente-->
+     <div v-else-if="operazione === 'showDocente'">           <!--operazoni tabella docente-->
                     <v-form  id="textbox Docente">
                     <v-container>
+                    <v-btn style="margin-bottom:5%"                   
+                        color="#E42217"
+                        elevation="2"                      
+                        raised
+                        v-on:click="deleteDocente"> Elimina 
+                    </v-btn>
                         <v-row>
                             <v-col
                             cols="12"
@@ -61,13 +66,7 @@ let OperazioniContainer = {
                             </v-col>
                      </v-row>
                      </v-form>        
-                    <v-btn                   
-                        color="#E42217"
-                        elevation="2"
-                       
-                        raised
-                        v-on:click="deleteDocente"> Elimina 
-                    </v-btn>
+                    
                      <v-btn type="submit" form="textbox form"                 
                         color="#41A317"
                         elevation="2"
@@ -77,9 +76,15 @@ let OperazioniContainer = {
                      </v-btn>
 </div>
     
-     <div v-else-if="operazione === 'corso'">   
+     <div v-else-if="operazione === 'showCorso'">   
      <v-form  id="textbox corso">
          <v-container>
+         <v-btn style="margin-bottom:5%"                  
+            color="#E42217"
+            elevation="2"                        
+            raised
+            v-on:click="deleteCorso"> Elimina 
+            </v-btn>
         <v-row>
           <v-col
             cols="12"
@@ -92,13 +97,7 @@ let OperazioniContainer = {
           </v-col>
           </v-row>
           </v-form> 
-                    <v-btn                   
-                        color="#E42217"
-                        elevation="2"
-                        
-                        raised
-                        v-on:click="deleteCorso"> Elimina 
-                    </v-btn>
+                    
                      <v-btn   type = "submit" form ="textbox corso"             
                         color="#41A317"
                         elevation="2"
@@ -107,9 +106,15 @@ let OperazioniContainer = {
                         v-on:click="insertCorso"> Inserisci 
                     </v-btn>
 </div>
-     <div v-else-if="operazione === 'Insegna'"> 
+     <div v-else-if="operazione === 'showInsegna'"> 
       <v-form  id="textbox insegna">
         <v-container>
+        <v-btn style="margin-bottom:5%"                    
+            color="#E42217"
+            elevation="2"
+            raised
+            v-on:click="deleteInsegna"> Elimina 
+            </v-btn>
         <v-row>
           <v-col
             cols="12"
@@ -145,12 +150,7 @@ let OperazioniContainer = {
           </v-col>
           </v-row>
                      </v-form> 
-                    <v-btn                   
-                        color="#E42217"
-                        elevation="2"
-                        raised
-                        v-on:click="deleteInsegna"> Elimina 
-                    </v-btn>
+                    
                      <v-btn  type="submit" form ="textbox insegna"                
                         color="#41A317"
                         elevation="2"
@@ -163,17 +163,19 @@ let OperazioniContainer = {
     methods:{
         async inserisciPrenotazione() {
 
-            if(this.checkSelected()){
                 this.azione = "inserisciPrenotazione";
 
                 let url = "ModificaServlet?azione="+this.azione+"&nome="+this.selected[0].nome+"&cognome="+this.selected[0].cognome+"&materia="+this.selected[0].materia+
                     "&account="+myStorage.getItem('utente')+"&data="+this.selected[0].data+"&ora="+this.selected[0].ora;
                 await fetch(url);
-                alert("Prenotazione effettuata con successo. Può controllare le prenotazioni attive clickando sul bottone cronologia prenotazioni");
-            }
-            else{
-                alert("Per eseguire quest'azione devi selezionare una riga della tabella.");
-            }
+                if(this.result == 0){
+                    alert("Non è stato possibile prenotare la ripetizione.");
+                }
+                else{
+                    this.$root.$emit('cambiata',Math.random());
+                    alert("Prenotazione effettuata con successo. Può controllare le prenotazioni attive clickando sul bottone cronologia prenotazioni");
+                }
+
         },
 
         async deletePrenotazione() {
@@ -186,7 +188,9 @@ let OperazioniContainer = {
                     alert("La prenotazione non può essere segnata come disdetta dopo la data della stessa.");
                 }
                 else{
+                    this.$root.$emit('cambiata',Math.random());
                     alert("Prenotazione segnata come 'disdetta' con successo.");
+
                 }
 
             }
@@ -211,6 +215,7 @@ let OperazioniContainer = {
                     alert("La prenotazione non può essere segnata come effettuata prima della data della stessa.");
                 }
                 else{
+                    this.$root.$emit('cambiata',Math.random());
                     alert("Prenotazione segnata come 'effettuata' con successo.");
                 }
             }
@@ -221,15 +226,11 @@ let OperazioniContainer = {
         },
 
         async insertDocente() {
-            if(this.checkSelected()){
                 this.azione = "inserisciDocente";
                 let url = "ModificaServlet?azione="+this.azione+"&nome="+this.nome+"&cognome="+this.cognome;
                 await fetch(url);
+                this.$root.$emit('cambiata',Math.random());
                 alert("Docente inserito con successo dal database.");
-            }
-            else{
-                alert("Per eseguire quest'azione devi selezionare una riga della tabella.");
-            }
 
         },
 
@@ -238,6 +239,7 @@ let OperazioniContainer = {
                 this.azione = "deleteDocente";
                 let url = "ModificaServlet?azione="+this.azione+"&nome="+this.selected[0].nome+"&cognome="+this.selected[0].cognome;
                 await fetch(url);
+                this.$root.$emit('cambiata',Math.random());
                 alert("Docente rimosso con successo dal database.");
             }
             else{
@@ -247,7 +249,6 @@ let OperazioniContainer = {
         },
 
         async insertCorso() {
-            if(this.checkSelected()){
                 this.azione = "inserisciCorso";
                 let url = "ModificaServlet?azione="+this.azione+"&materia="+this.materia;
                 await fetch(url)
@@ -258,12 +259,9 @@ let OperazioniContainer = {
                     alert("Il corso esiste già nel database.");
                 }
                 else{
+                    this.$root.$emit('cambiata',Math.random());
                     alert("Corso inserito con successo dal database.");
                 };
-            }
-            else{
-                alert("Per eseguire quest'azione devi selezionare una riga della tabella.");
-            }
 
         },
 
@@ -272,6 +270,7 @@ let OperazioniContainer = {
                 this.azione = "deleteCorso";
                 let url = "ModificaServlet?azione="+this.azione+"&materia="+this.selected[0].Materia;
                 await fetch(url);
+                this.$root.$emit('cambiata',Math.random());
                 alert("Corso rimosso con successo dal database.");
             }
             else{
@@ -281,7 +280,6 @@ let OperazioniContainer = {
         },
 
         async insertInsegna() {
-            if(this.checkSelected()) {
                 this.azione = "inserisciInsegna";
                 let url = "ModificaServlet?azione=" + this.azione + "&nome=" + this.nome + "&cognome=" + this.cognome + "&materia=" + this.materia;
                 await fetch(url)
@@ -291,12 +289,9 @@ let OperazioniContainer = {
                 if (this.result == 0) {
                     alert("Docente e/o corso non presenti nel database.");
                 } else {
+                    this.$root.$emit('cambiata',Math.random());
                     alert("Docente e Materia inseriti con successo dal database.");
                 }
-            }
-            else{
-                alert("Per eseguire quest'azione devi selezionare una riga della tabella.");
-            }
 
         },
 
@@ -305,6 +300,7 @@ let OperazioniContainer = {
                 this.azione = "deleteInsegna";
                 let url = "ModificaServlet?azione=" + this.azione + "&nome=" + this.selected[0].nome + "&cognome=" + this.selected[0].cognome + "&materia=" + this.selected[0].materia;
                 await fetch(url);
+                this.$root.$emit('cambiata',Math.random());
                 alert("Coppia Docente-Corso rimossi con successo dal database.");
             }
             else{

@@ -5,12 +5,12 @@ let LoginContainer = {
 
             username: '',
             usernameRules: [
-                v => !!v || 'username is required'
+                v => !!v || 'Username non può essere vuoto'
             ],
             password: '',
             passwordRules: [
-                v => !!v || 'password is required',
-                v => v.length <= 8 || 'password must be less than 8 characters',
+                v => !!v || 'Password non può essere vuota',
+                v => v.length <= 8 || 'La password deve avere meno di 8 caratteri',
             ],
             show_password: false,
             ruolo: "",
@@ -34,7 +34,7 @@ let LoginContainer = {
                     :type="show_password ? 'text' : 'password'"
                     name="input-10-1"
                     label="Password"
-                    hint="At least 8 characters"
+                    hint="Al più 8 caratteri"
                     :counter="8"
                     @click:append="show_password = !show_password"
                     required

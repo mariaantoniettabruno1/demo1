@@ -8,7 +8,6 @@ let AmministratoreContainer = {
             tabella: [], // item interni alla tabella
             selected: [], // oggetto selezionato dall'utente
             op: "", // operazione da passare al componente operazioni
-            updater: 0,
         }
     },
     components: { OperazioniContainer },
@@ -69,32 +68,35 @@ let AmministratoreContainer = {
                 </v-container>
         </v-main>
     `,
+    mounted() {
+        this.$root.$on('cambiata', async () => await this.getHeaders());
+    },
     methods: {
         async showRipetizioni() {
             this.azione = "showRipetizioni";
             await this.getHeaders();
-            this.op = "ripetizioni";
+            this.op = "showRipetizioni";
         },
 
         async showPrenotazione() {
             this.azione = "showPrenotazioneAmministratore";
             await this.getHeaders();
-            this.op = "prenotazione";
+            this.op = "showPrenotazione";
         },
         async showDocente() {
             this.azione = "showDocente";
             await this.getHeaders();
-            this.op = "docente";
+            this.op = "showDocente";
         },
         async showCorso() {
             this.azione = "showCorso";
             await this.getHeaders();
-            this.op = "corso";
+            this.op = "showCorso";
         },
         async showInsegna() {
             this.azione = "showInsegna";
             await this.getHeaders();
-            this.op = "Insegna";
+            this.op = "showInsegna";
         },
 
         async getHeaders() {
